@@ -314,7 +314,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     // Mark: - Task Creation
 
     @IBAction func newTask(_ sender: UIButton) {
-        let controller = UIAlertController(title: "New Task", message: "Make a new task", preferredStyle: .alert)
+        let controller = UIAlertController(title: "New Task", message: "What do you want to call it?", preferredStyle: .alert)
         
         controller.addTextField(configurationHandler: nil)
         
@@ -348,7 +348,23 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         let task = self.tasks[index.row]
         let cell = cellAt(index: index.row)
         
-        let controller = UIAlertController(title: "Edit Task", message: "Edit an existing task", preferredStyle: .alert)
+        let controller = UIAlertController(title: "Edit Task", message: "Edit Task '\(task.name)'", preferredStyle: .actionSheet)
+        
+        controller.addAction(UIAlertAction(title: "Rename", style: .default, handler: { _ in
+            self.renameTask(task: task, cell: cell)
+        }))
+        
+        controller.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
+            self.deleteTask (task: task, cell: cell)
+        }))
+        
+        controller.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        
+        self.present(controller, animated: true, completion: nil)
+    }
+    
+    private func renameTask(task: TimedTask, cell: TaskCell) {
+        let controller = UIAlertController(title: "Rename Task", message: "What do you want to call it?", preferredStyle: .alert)
         
         controller.addTextField(configurationHandler: { field in
             field.text = task.name
@@ -368,6 +384,28 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         controller.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         
         self.present(controller, animated: true, completion: nil)
+    }
+    
+    private func deleteTask(task: TimedTask, cell: TaskCell) {
+        if task.active() {
+            self.activeIndex = nil
+            cell.stop()
+        }
+        
+        if let index = self.tableView.indexPath(for: cell)?.row {
+            for i in index..<self.tasks.count {
+                cellAt(index: i).moveDown()
+            }
+            
+            if let activeIndex = self.activeIndex {
+                if activeIndex > index {
+                    self.activeIndex = activeIndex - 1
+                }
+            }
+        
+            self.tasks.remove(at: index)
+            self.tableView.deleteRows(at: [IndexPath(row: index, section: 0)], with: .fade)
+        }
     }
     
     // Mark: - Timer State Change
