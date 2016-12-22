@@ -8,7 +8,8 @@
 
 import UIKit
 
-let epsilon: CGFloat = 0.001
+let SpinTicks = 4
+let Epsilon: CGFloat = 0.001
 
 class TimedTask {
     var name: String
@@ -76,6 +77,8 @@ class TaskCell: UITableViewCell {
     private var task: TimedTask?
     private var index: Int?
     private var delegate: TimerStateChangedDelegate?
+    private var animating = false
+    private var animationCount = 0
 
     @IBOutlet weak var elapsed: UILabel!
     @IBOutlet weak var name: UILabel!
@@ -144,20 +147,14 @@ class TaskCell: UITableViewCell {
         }
 
         task.start()
-
+        self.startSpin()
+        
         self.outline.isHidden = false
         self.outline.transform = CGAffineTransform(scaleX: 0, y: 0)
 
-        UIView.animate(withDuration: 0.25, animations: {
+        UIView.animate(withDuration: 0.5, animations: {
             self.outline.transform = CGAffineTransform(scaleX: 1, y: 1)
         }, completion: { _ in
-            let animation = CABasicAnimation(keyPath: "transform.rotation")
-            animation.fromValue = 0
-            animation.toValue = Float.pi * 2
-            animation.duration = 1
-            animation.repeatCount = .infinity
-            self.toggle.layer.add(animation, forKey: "rotate")
-
             self.currentElapsed.isHidden = false
             let t = self.currentElapsed.center.x
             self.currentElapsed.center.x = self.outline.center.x
@@ -169,40 +166,38 @@ class TaskCell: UITableViewCell {
             }, completion: nil)
         })
     }
-
+    
     func stop() {
         guard let task = self.task else {
             return
         }
 
         task.stop()
+        self.stopSpin()
 
         let t = self.currentElapsed.center.x
 
         UIView.animate(withDuration: 0.5, animations: {
             self.currentElapsed.center.x = self.outline.center.x
-            self.currentElapsed.transform = CGAffineTransform(scaleX: epsilon, y: 1)
+            self.currentElapsed.transform = CGAffineTransform(scaleX: Epsilon, y: 1)
         }, completion: { _ in
             self.currentElapsed.isHidden = true
             self.currentElapsed.center.x = t
 
-            UIView.animate(withDuration: 0.25, animations: {
-                self.outline.transform = CGAffineTransform(scaleX: epsilon, y: epsilon)
+            UIView.animate(withDuration: 0.5, animations: {
+                self.outline.transform = CGAffineTransform(scaleX: Epsilon, y: Epsilon)
             }, completion: { success in
-                // TODO - see if we can complete current rotation
-                self.toggle.layer.removeAllAnimations()
-
                 self.outline.isHidden = true
                 self.currentElapsed.isHidden = true
             })
         })
     }
-
+    
     @IBAction func toggled(_ sender: UIButton) {
         guard let task = self.task, let index = self.index, let delegate = self.delegate else {
             return
         }
-
+        
         if !task.active() {
             start()
             delegate.started(index: index)
@@ -212,6 +207,38 @@ class TaskCell: UITableViewCell {
         }
 
         self.update()
+    }
+    
+    // Mark: - Spin Animation
+    
+    private func spin() {
+        self.animationCount = (self.animationCount + 1) % SpinTicks
+        
+        UIView.animate(withDuration: 1 / Double(SpinTicks), delay: 0, options: [.allowUserInteraction, .curveLinear], animations: {
+            self.toggle.transform = self.toggle.transform.rotated(by: 2 * CGFloat(Float.pi) / CGFloat(SpinTicks))
+        }, completion: { _ in
+            if self.animating {
+                self.spin()
+            } else {
+                if self.animationCount != 0 {
+                    self.spin()
+                }
+            }
+        })
+    }
+    
+    private func startSpin() {
+        if self.animating {
+            return
+        }
+        
+        self.animating = true
+        self.animationCount = 0
+        spin()
+    }
+    
+    private func stopSpin() {
+        self.animating = false
     }
 }
 
