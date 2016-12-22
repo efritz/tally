@@ -234,8 +234,24 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
 
     @IBAction func newTask(_ sender: UIButton) {
-        tasks.append(TimedTask(name: "New Task"))
-        tableView.insertRows(at: [IndexPath(row: tasks.count - 1, section: 0)], with: .bottom)
+        let controller = UIAlertController(title: "New Task", message: "Make a new task", preferredStyle: .alert)
+        
+        controller.addTextField(configurationHandler: nil)
+        
+        controller.addAction(UIAlertAction(title: "Create", style: .default, handler: { _ in
+            if let field = controller.textFields?.first, let name = field.text {
+                if name == "" {
+                    return
+                }
+                
+                self.tasks.append(TimedTask(name: name))
+                self.tableView.insertRows(at: [IndexPath(row: self.tasks.count - 1, section: 0)], with: .bottom)
+            }
+        }))
+        
+        controller.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        
+        self.present(controller, animated: true, completion: nil)
     }
 
     override func didReceiveMemoryWarning() {
