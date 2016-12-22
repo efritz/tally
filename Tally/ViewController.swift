@@ -81,18 +81,21 @@ class TaskCell: UITableViewCell {
     private var moving = false
     private var animating = false
     private var animationCount = 0
+    private lazy var elapsedTarget: CGFloat = { [unowned self] in
+        return self.currentElapsed.center.x
+    }()
 
     @IBOutlet weak var elapsed: UILabel!
     @IBOutlet weak var name: UILabel!
     @IBOutlet weak var currentElapsed: UILabel!
     @IBOutlet weak var toggle: UIButton!
     @IBOutlet weak var outline: UIView!
-
+    
     func setup(task: TimedTask, index: Int, delegate: TimerStateChangedDelegate) {
         self.task = task
         self.index = index
         self.delegate = delegate
-
+        
         // Fix view depths
         self.contentView.sendSubview(toBack: self.currentElapsed)
         self.contentView.sendSubview(toBack: self.name)
@@ -114,7 +117,6 @@ class TaskCell: UITableViewCell {
         self.updateName()
     }
     
-
     func update() {
         if let task = self.task {
             elapsed.text = formatElapsed(task.elapsed())
@@ -147,23 +149,39 @@ class TaskCell: UITableViewCell {
         guard let task = self.task else {
             return
         }
-
+        
         task.start()
         self.startSpin()
+        
+        // Ensure value is calculated
+        let target = self.elapsedTarget
+        
+        // Stop any current animations
+        self.outline.layer.removeAllAnimations()
+        self.currentElapsed.layer.removeAllAnimations()
+        
+        // Ensure state at end of animation
+        self.currentElapsed.center.x = self.outline.center.x
+        self.currentElapsed.transform = CGAffineTransform(scaleX: Epsilon, y: 1)
+        self.outline.isHidden = true
+        self.currentElapsed.isHidden = true
         
         self.outline.isHidden = false
         self.outline.transform = CGAffineTransform(scaleX: 0, y: 0)
 
         UIView.animate(withDuration: 0.5, animations: {
             self.outline.transform = CGAffineTransform(scaleX: 1, y: 1)
-        }, completion: { _ in
+        }, completion: { finished in
+            if !finished {
+                return
+            }
+            
             self.currentElapsed.isHidden = false
-            let t = self.currentElapsed.center.x
             self.currentElapsed.center.x = self.outline.center.x
             self.currentElapsed.transform = CGAffineTransform(scaleX: 0, y: 1)
 
             UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseInOut, animations: {
-                self.currentElapsed.center.x = t
+                self.currentElapsed.center.x = target
                 self.currentElapsed.transform = CGAffineTransform(scaleX: 1, y: 1)
             }, completion: nil)
         })
@@ -173,22 +191,37 @@ class TaskCell: UITableViewCell {
         guard let task = self.task else {
             return
         }
-
+        
         task.stop()
         self.stopSpin()
 
-        let t = self.currentElapsed.center.x
-
+        // Stop any current animations
+        self.outline.layer.removeAllAnimations()
+        self.currentElapsed.layer.removeAllAnimations()
+        
+        // Ensure state at end of animation
+        self.currentElapsed.isHidden = false
+        self.outline.transform = CGAffineTransform(scaleX: 1, y: 1)
+        self.currentElapsed.center.x = self.elapsedTarget
+        self.currentElapsed.transform = CGAffineTransform(scaleX: 1, y: 1)
+        
         UIView.animate(withDuration: 0.5, animations: {
             self.currentElapsed.center.x = self.outline.center.x
             self.currentElapsed.transform = CGAffineTransform(scaleX: Epsilon, y: 1)
-        }, completion: { _ in
+        }, completion: { finished in
+            if !finished {
+                return
+            }
+            
             self.currentElapsed.isHidden = true
-            self.currentElapsed.center.x = t
 
             UIView.animate(withDuration: 0.5, animations: {
                 self.outline.transform = CGAffineTransform(scaleX: Epsilon, y: Epsilon)
-            }, completion: { success in
+            }, completion: { finished in
+                if !finished {
+                    return
+                }
+                
                 self.outline.isHidden = true
                 self.currentElapsed.isHidden = true
             })
