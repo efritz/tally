@@ -88,8 +88,6 @@ class TaskCell: UITableViewCell {
         self.index = index
         self.delegate = delegate
 
-        self.name.text = task.name
-
         // Fix view depths
         self.contentView.sendSubview(toBack: self.currentElapsed)
         self.contentView.sendSubview(toBack: self.name)
@@ -108,7 +106,9 @@ class TaskCell: UITableViewCell {
         self.currentElapsed.backgroundColor = r
 
         self.update()
+        self.updateName()
     }
+    
 
     func update() {
         if let task = self.task {
@@ -117,6 +117,12 @@ class TaskCell: UITableViewCell {
             if task.active() {
                 self.currentElapsed.text = formatElapsed(task.currentElapsed())
             }
+        }
+    }
+    
+    func updateName() {
+        if let task = self.task {
+            self.name.text = task.name
         }
     }
 
@@ -232,6 +238,12 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         tasks.append(TimedTask(name: "t2"))
         tasks.append(TimedTask(name: "t3"))
     }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+    }
+    
+    // Mark: - Task Creation
 
     @IBAction func newTask(_ sender: UIButton) {
         let controller = UIAlertController(title: "New Task", message: "Make a new task", preferredStyle: .alert)
@@ -254,10 +266,42 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         self.present(controller, animated: true, completion: nil)
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
+    // Mark: - Task Editing
+    
+    func edit(recognizer: UILongPressGestureRecognizer) {
+        if recognizer.state != .began {
+            return
+        }
+        
+        guard let index = self.tableView.indexPathForRow(at: recognizer.location(in: self.tableView)) else {
+            return
+        }
+        
+        let task = self.tasks[index.row]
+        let cell = cellAt(index: index.row)
+        
+        let controller = UIAlertController(title: "Edit Task", message: "Edit an existing task", preferredStyle: .alert)
+        
+        controller.addTextField(configurationHandler: { field in
+            field.text = task.name
+        })
+        
+        controller.addAction(UIAlertAction(title: "Rename", style: .default, handler: { _ in
+            if let field = controller.textFields?.first, let name = field.text {
+                if name == "" {
+                    return
+                }
+                
+                task.name = name
+                cell.updateName()
+            }
+        }))
+        
+        controller.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        
+        self.present(controller, animated: true, completion: nil)
     }
-
+    
     // Mark: - Timer State Change
 
     func started(index: Int) {
@@ -335,6 +379,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
 
         if let cell = cell as? TaskCell {
             cell.setup(task: self.tasks[indexPath.row], index: indexPath.row, delegate: self)
+            cell.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(edit(recognizer:))))
         }
 
         return cell
