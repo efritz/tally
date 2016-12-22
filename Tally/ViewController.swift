@@ -77,6 +77,8 @@ class TaskCell: UITableViewCell {
     private var task: TimedTask?
     private var index: Int?
     private var delegate: TimerStateChangedDelegate?
+    
+    private var moving = false
     private var animating = false
     private var animationCount = 0
 
@@ -211,7 +213,25 @@ class TaskCell: UITableViewCell {
     
     // Mark: - Spin Animation
     
+    private func startSpin() {
+        if self.animating {
+            return
+        }
+        
+        self.animating = true
+        
+        if !self.moving {
+            self.animationCount = 0
+            self.spin()
+        }
+    }
+    
+    private func stopSpin() {
+        self.animating = false
+    }
+    
     private func spin() {
+        self.moving = true
         self.animationCount = (self.animationCount + 1) % SpinTicks
         
         UIView.animate(withDuration: 1 / Double(SpinTicks), delay: 0, options: [.allowUserInteraction, .curveLinear], animations: {
@@ -222,23 +242,11 @@ class TaskCell: UITableViewCell {
             } else {
                 if self.animationCount != 0 {
                     self.spin()
+                } else {
+                    self.moving = false
                 }
             }
         })
-    }
-    
-    private func startSpin() {
-        if self.animating {
-            return
-        }
-        
-        self.animating = true
-        self.animationCount = 0
-        spin()
-    }
-    
-    private func stopSpin() {
-        self.animating = false
     }
 }
 
