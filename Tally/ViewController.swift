@@ -73,6 +73,39 @@ class Duration {
     }
 }
 
+protocol NewTaskDelegate {
+    func makeNewTask()
+}
+
+class NewTaskCell: UITableViewCell {
+    private var delegate: NewTaskDelegate?
+    
+    @IBOutlet weak var outline: UIView!
+    
+    func setup(delegate: NewTaskDelegate) {
+        self.delegate = delegate
+        
+        self.outline.layer.cornerRadius = self.outline.layer.bounds.width / 2
+        self.outline.clipsToBounds = true
+    }
+    
+    @IBAction func create(_ sender: UIButton) {
+        UIView.animate(withDuration: 0.15, delay: 0, options: .curveEaseIn, animations: {
+            sender.transform = CGAffineTransform(scaleX: 1.75, y: 1.75)
+            self.outline.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
+        }, completion: { _ in
+            UIView.animate(withDuration: 0.15, delay: 0, options: .curveEaseOut, animations: {
+                sender.transform = CGAffineTransform(scaleX: 1, y: 1)
+                self.outline.transform = CGAffineTransform(scaleX: 1, y: 1)
+            }, completion: nil)
+        })
+        
+        if let delegate = self.delegate {
+            delegate.makeNewTask()
+        }
+    }
+}
+
 class TaskCell: UITableViewCell {
     private var task: TimedTask?
     private var index: Int?
@@ -288,7 +321,7 @@ protocol TimerStateChangedDelegate {
     func stopped(index: Int)
 }
 
-class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, TimerStateChangedDelegate {
+class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, TimerStateChangedDelegate, NewTaskDelegate {
     private var tasks = [TimedTask]()
     private var activeIndex: Int?
     private var timer: Timer?
@@ -313,7 +346,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     
     // Mark: - Task Creation
 
-    @IBAction func newTask(_ sender: UIButton) {
+    func makeNewTask() {
         let controller = UIAlertController(title: "New Task", message: "What do you want to call it?", preferredStyle: .alert)
         
         controller.addTextField(configurationHandler: nil)
@@ -473,22 +506,37 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     // MARK: - Table View
 
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+        return 2
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return tasks.count
+        if section == 0 {
+            return tasks.count
+        } else {
+            return 1
+        }
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+        if indexPath.section == 0 {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "task", for: indexPath)
 
-        if let cell = cell as? TaskCell {
-            cell.setup(task: self.tasks[indexPath.row], index: indexPath.row, delegate: self)
-            cell.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(edit(recognizer:))))
+            if let cell = cell as? TaskCell {
+                cell.setup(task: self.tasks[indexPath.row], index: indexPath.row, delegate: self)
+                // TODO - move to delegate
+                cell.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(edit(recognizer:))))
+            }
+
+            return cell
+        } else {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "newTask", for: indexPath)
+            
+            if let cell = cell as? NewTaskCell {
+                cell.setup(delegate: self)
+            }
+            
+            return cell
         }
-
-        return cell
     }
 }
 
