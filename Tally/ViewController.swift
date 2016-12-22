@@ -78,7 +78,7 @@ class TaskCell: UITableViewCell {
     private var delegate: TimerStateChangedDelegate?
 
     @IBOutlet weak var elapsed: UILabel!
-    @IBOutlet weak var name: UITextField!
+    @IBOutlet weak var name: UILabel!
     @IBOutlet weak var currentElapsed: UILabel!
     @IBOutlet weak var toggle: UIButton!
     @IBOutlet weak var outline: UIView!

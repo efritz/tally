@@ -49,12 +49,6 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="My Task" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Dgq-YT-aA3">
-                                                    <rect key="frame" x="76" y="25" width="226" height="17"/>
-                                                    <nil key="textColor"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                                    <textInputTraits key="textInputTraits"/>
-                                                </textField>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cDJ-Az-Chd" userLabel="Outline">
                                                     <rect key="frame" x="312" y="4" width="58" height="58"/>
                                                     <color key="backgroundColor" red="0.0" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
@@ -77,6 +71,12 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Q8x-RX-SH1">
+                                                    <rect key="frame" x="71" y="22.5" width="236" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="PuJ-tb-gAf" firstAttribute="height" secondItem="91g-rq-oe3" secondAttribute="height" id="1O3-Re-9hy"/>
@@ -86,16 +86,16 @@
                                                 <constraint firstItem="hhp-EM-pNX" firstAttribute="width" secondItem="PuJ-tb-gAf" secondAttribute="width" constant="10" id="Dt5-NK-eo8"/>
                                                 <constraint firstItem="PuJ-tb-gAf" firstAttribute="leading" secondItem="91g-rq-oe3" secondAttribute="leadingMargin" id="Fa8-Hw-hHK"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="cDJ-Az-Chd" secondAttribute="trailing" constant="5" id="FdY-fe-x70"/>
-                                                <constraint firstItem="Dgq-YT-aA3" firstAttribute="leading" secondItem="PuJ-tb-gAf" secondAttribute="trailing" constant="10" id="IKk-Kt-b18"/>
+                                                <constraint firstItem="Q8x-RX-SH1" firstAttribute="leading" secondItem="PuJ-tb-gAf" secondAttribute="trailing" constant="5" id="GDz-X9-wFm"/>
                                                 <constraint firstItem="hhp-EM-pNX" firstAttribute="height" secondItem="91g-rq-oe3" secondAttribute="height" multiplier="0.5" id="PCW-1u-2Uh"/>
                                                 <constraint firstItem="cDJ-Az-Chd" firstAttribute="height" secondItem="91g-rq-oe3" secondAttribute="height" multiplier="0.9" id="W0X-Ja-mDp"/>
                                                 <constraint firstItem="hhp-EM-pNX" firstAttribute="centerY" secondItem="91g-rq-oe3" secondAttribute="centerY" id="ZoT-Na-gWy"/>
-                                                <constraint firstItem="cDJ-Az-Chd" firstAttribute="leading" secondItem="Dgq-YT-aA3" secondAttribute="trailing" constant="10" id="eEn-3P-P5O"/>
+                                                <constraint firstItem="cDJ-Az-Chd" firstAttribute="leading" secondItem="Q8x-RX-SH1" secondAttribute="trailing" constant="5" id="d04-7W-teB"/>
                                                 <constraint firstItem="cDJ-Az-Chd" firstAttribute="leading" secondItem="hhp-EM-pNX" secondAttribute="trailing" constant="-10" id="euk-Go-nbH"/>
                                                 <constraint firstItem="PuJ-tb-gAf" firstAttribute="centerY" secondItem="91g-rq-oe3" secondAttribute="centerY" id="h3x-6d-1TU"/>
                                                 <constraint firstItem="r85-wA-jtE" firstAttribute="centerY" secondItem="cDJ-Az-Chd" secondAttribute="centerY" id="hM6-EP-Gfr"/>
                                                 <constraint firstItem="cDJ-Az-Chd" firstAttribute="centerY" secondItem="91g-rq-oe3" secondAttribute="centerY" id="k6R-dk-32u"/>
-                                                <constraint firstItem="Dgq-YT-aA3" firstAttribute="centerY" secondItem="91g-rq-oe3" secondAttribute="centerY" id="mhY-LD-vHa"/>
+                                                <constraint firstItem="Q8x-RX-SH1" firstAttribute="centerY" secondItem="91g-rq-oe3" secondAttribute="centerY" id="lFd-uy-9E3"/>
                                             </constraints>
                                             <edgeInsets key="layoutMargins" top="0.0" left="0.0" bottom="0.0" right="0.0"/>
                                         </tableViewCellContentView>
@@ -103,7 +103,7 @@
                                         <connections>
                                             <outlet property="currentElapsed" destination="hhp-EM-pNX" id="wgk-ix-v89"/>
                                             <outlet property="elapsed" destination="PuJ-tb-gAf" id="a9d-Ds-HUD"/>
-                                            <outlet property="name" destination="Dgq-YT-aA3" id="4iz-q4-SGa"/>
+                                            <outlet property="name" destination="Q8x-RX-SH1" id="d2a-Au-Hjh"/>
                                             <outlet property="outline" destination="cDJ-Az-Chd" id="SY2-92-Bju"/>
                                             <outlet property="toggle" destination="r85-wA-jtE" id="B6S-Qx-tIH"/>
                                         </connections>
