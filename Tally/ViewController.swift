@@ -245,7 +245,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
                 }
                 
                 self.tasks.append(TimedTask(name: name))
-                self.tableView.insertRows(at: [IndexPath(row: self.tasks.count - 1, section: 0)], with: .bottom)
+                self.tableView.insertRows(at: [IndexPath(row: self.tasks.count - 1, section: 0)], with: .right)
             }
         }))
         
