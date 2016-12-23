@@ -50,7 +50,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Q8x-RX-SH1">
-                                                    <rect key="frame" x="71" y="22" width="236" height="21"/>
+                                                    <rect key="frame" x="81" y="22" width="226" height="21"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -88,7 +88,7 @@
                                                 <constraint firstItem="hhp-EM-pNX" firstAttribute="width" secondItem="PuJ-tb-gAf" secondAttribute="width" constant="10" id="Dt5-NK-eo8"/>
                                                 <constraint firstItem="PuJ-tb-gAf" firstAttribute="leading" secondItem="91g-rq-oe3" secondAttribute="leadingMargin" id="Fa8-Hw-hHK"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="cDJ-Az-Chd" secondAttribute="trailing" constant="5" id="FdY-fe-x70"/>
-                                                <constraint firstItem="Q8x-RX-SH1" firstAttribute="leading" secondItem="PuJ-tb-gAf" secondAttribute="trailing" constant="5" id="GDz-X9-wFm"/>
+                                                <constraint firstItem="Q8x-RX-SH1" firstAttribute="leading" secondItem="PuJ-tb-gAf" secondAttribute="trailing" constant="15" id="GDz-X9-wFm"/>
                                                 <constraint firstItem="hhp-EM-pNX" firstAttribute="height" secondItem="91g-rq-oe3" secondAttribute="height" multiplier="0.5" id="PCW-1u-2Uh"/>
                                                 <constraint firstItem="cDJ-Az-Chd" firstAttribute="height" secondItem="91g-rq-oe3" secondAttribute="height" multiplier="0.9" id="W0X-Ja-mDp"/>
                                                 <constraint firstItem="hhp-EM-pNX" firstAttribute="centerY" secondItem="91g-rq-oe3" secondAttribute="centerY" id="ZoT-Na-gWy"/>
@@ -125,7 +125,7 @@
                                                     </constraints>
                                                 </view>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Create a new task" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hYp-8E-ldn" userLabel="Hint">
-                                                    <rect key="frame" x="38" y="25" width="268.5" height="16"/>
+                                                    <rect key="frame" x="48" y="25" width="258.5" height="16"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="13"/>
                                                     <color key="textColor" white="0.40224484716142928" alpha="1" colorSpace="calibratedWhite"/>
                                                     <nil key="highlightedColor"/>
@@ -139,7 +139,7 @@
                                                     <edgeInsets key="layoutMargins" top="0.0" left="0.0" bottom="0.0" right="0.0"/>
                                                 </view>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="CYk-xh-mkS" userLabel="Outline">
-                                                    <rect key="frame" x="317.5" y="9" width="46.5" height="47"/>
+                                                    <rect key="frame" x="319" y="10.5" width="44" height="44.5"/>
                                                     <color key="backgroundColor" red="0.32310543980109163" green="1" blue="0.6351519237688632" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" secondItem="CYk-xh-mkS" secondAttribute="height" multiplier="1:1" id="hao-fj-3lr"/>
@@ -147,7 +147,7 @@
                                                     <edgeInsets key="layoutMargins" top="0.0" left="0.0" bottom="0.0" right="0.0"/>
                                                 </view>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rxw-Jv-blS" userLabel="New Task">
-                                                    <rect key="frame" x="323.5" y="15" width="35.5" height="35.5"/>
+                                                    <rect key="frame" x="325" y="16.5" width="32.5" height="32.5"/>
                                                     <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="calibratedRGB"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" secondItem="rxw-Jv-blS" secondAttribute="height" multiplier="1:1" id="kyA-sQ-iGE"/>
@@ -162,7 +162,7 @@
                                                 <constraint firstItem="rxw-Jv-blS" firstAttribute="height" secondItem="CYk-xh-mkS" secondAttribute="height" multiplier="0.75" id="17Y-Hb-aoR"/>
                                                 <constraint firstItem="LBb-0f-XNB" firstAttribute="centerY" secondItem="D8Z-Pd-bgh" secondAttribute="centerY" id="3of-tt-hQE"/>
                                                 <constraint firstItem="7d6-ij-43I" firstAttribute="leading" secondItem="D8Z-Pd-bgh" secondAttribute="leadingMargin" id="Ddu-YT-hTG"/>
-                                                <constraint firstItem="hYp-8E-ldn" firstAttribute="leading" secondItem="7d6-ij-43I" secondAttribute="trailing" constant="5" id="GVP-yR-7ER"/>
+                                                <constraint firstItem="hYp-8E-ldn" firstAttribute="leading" secondItem="7d6-ij-43I" secondAttribute="trailing" constant="15" id="GVP-yR-7ER"/>
                                                 <constraint firstItem="LBb-0f-XNB" firstAttribute="height" secondItem="D8Z-Pd-bgh" secondAttribute="height" multiplier="0.9" id="O2w-eZ-Ms9"/>
                                                 <constraint firstItem="7d6-ij-43I" firstAttribute="height" secondItem="D8Z-Pd-bgh" secondAttribute="height" id="TvI-xZ-drx"/>
                                                 <constraint firstItem="rxw-Jv-blS" firstAttribute="centerY" secondItem="CYk-xh-mkS" secondAttribute="centerY" id="UkQ-aR-vRL"/>
@@ -171,7 +171,7 @@
                                                 <constraint firstItem="LBb-0f-XNB" firstAttribute="leading" secondItem="hYp-8E-ldn" secondAttribute="trailing" constant="5" id="a43-67-EWR"/>
                                                 <constraint firstItem="rxw-Jv-blS" firstAttribute="centerX" secondItem="CYk-xh-mkS" secondAttribute="centerX" id="iBo-Vl-eWh"/>
                                                 <constraint firstItem="7d6-ij-43I" firstAttribute="centerY" secondItem="D8Z-Pd-bgh" secondAttribute="centerY" id="kzo-SF-3gp"/>
-                                                <constraint firstItem="CYk-xh-mkS" firstAttribute="height" secondItem="LBb-0f-XNB" secondAttribute="height" multiplier="0.8" id="mgu-14-Rto"/>
+                                                <constraint firstItem="CYk-xh-mkS" firstAttribute="height" secondItem="LBb-0f-XNB" secondAttribute="height" multiplier="0.75" id="mgu-14-Rto"/>
                                                 <constraint firstItem="CYk-xh-mkS" firstAttribute="centerY" secondItem="LBb-0f-XNB" secondAttribute="centerY" id="mup-Cy-B0N"/>
                                                 <constraint firstItem="CYk-xh-mkS" firstAttribute="centerX" secondItem="LBb-0f-XNB" secondAttribute="centerX" id="vwM-Dh-prj"/>
                                             </constraints>

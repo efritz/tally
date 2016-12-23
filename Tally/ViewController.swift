@@ -9,7 +9,7 @@
 import UIKit
 
 let SpinTicks = 4
-let Epsilon: CGFloat = 0.001
+let Epsilon: CGFloat = 0.00001
 
 class TimedTask {
     var name: String
@@ -91,7 +91,7 @@ class NewTaskCell: UITableViewCell {
     
     @IBAction func create(_ sender: UIButton) {
         UIView.animate(withDuration: 0.15, delay: 0, options: .curveEaseIn, animations: {
-            sender.transform = CGAffineTransform(scaleX: 1.75, y: 1.75)
+            sender.transform = CGAffineTransform(scaleX: 1.75, y: 1.75).rotated(by: CGFloat(Float.pi))
             self.outline.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
         }, completion: { _ in
             UIView.animate(withDuration: 0.15, delay: 0, options: .curveEaseOut, animations: {
@@ -114,9 +114,6 @@ class TaskCell: UITableViewCell {
     private var moving = false
     private var animating = false
     private var animationCount = 0
-    private lazy var elapsedTarget: CGFloat = { [unowned self] in
-        return self.currentElapsed.center.x
-    }()
 
     @IBOutlet weak var elapsed: UILabel!
     @IBOutlet weak var name: UILabel!
@@ -132,15 +129,18 @@ class TaskCell: UITableViewCell {
         // Fix view depths
         self.contentView.sendSubview(toBack: self.currentElapsed)
         self.contentView.sendSubview(toBack: self.name)
-
+        
+        // Setup, hide outline
+        self.outline.isHidden = true
+        self.outline.layer.cornerRadius = self.outline.layer.bounds.width / 2
+        self.outline.clipsToBounds = true
+        
+        // Setup, hide elapsed
         self.currentElapsed.isHidden = true
         self.currentElapsed.layer.cornerRadius = 5
         self.currentElapsed.clipsToBounds = true
 
-        self.outline.isHidden = true
-        self.outline.layer.cornerRadius = self.outline.layer.bounds.width / 2
-        self.outline.clipsToBounds = true
-
+        // Create colors
         let r = makeRandomColor(mix: UIColor.white)
         self.elapsed.backgroundColor = r
         self.outline.backgroundColor = r
@@ -183,38 +183,32 @@ class TaskCell: UITableViewCell {
             return
         }
         
-        task.start()
-        self.startSpin()
-        
-        // Ensure value is calculated
-        let target = self.elapsedTarget
-        
         // Stop any current animations
         self.outline.layer.removeAllAnimations()
         self.currentElapsed.layer.removeAllAnimations()
         
-        // Ensure state at end of animation
-        self.currentElapsed.center.x = self.outline.center.x
-        self.currentElapsed.transform = CGAffineTransform(scaleX: Epsilon, y: 1)
-        self.outline.isHidden = true
-        self.currentElapsed.isHidden = true
+        // Start update
+        task.start()
+        self.startSpin()
         
+        // Shrink outline
         self.outline.isHidden = false
         self.outline.transform = CGAffineTransform(scaleX: 0, y: 0)
-
+        
+        // Shrink elapsed
+        self.currentElapsed.isHidden = false
+        self.currentElapsed.transform = CGAffineTransform(translationX: self.outline.center.x - self.currentElapsed.center.x, y: 0).scaledBy(x: Epsilon, y: 1)
+        
         UIView.animate(withDuration: 0.5, animations: {
+            // Grow outline
             self.outline.transform = CGAffineTransform(scaleX: 1, y: 1)
         }, completion: { finished in
             if !finished {
                 return
             }
             
-            self.currentElapsed.isHidden = false
-            self.currentElapsed.center.x = self.outline.center.x
-            self.currentElapsed.transform = CGAffineTransform(scaleX: 0, y: 1)
-
             UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseInOut, animations: {
-                self.currentElapsed.center.x = target
+                // Grow elapsed
                 self.currentElapsed.transform = CGAffineTransform(scaleX: 1, y: 1)
             }, completion: nil)
         })
@@ -225,38 +219,43 @@ class TaskCell: UITableViewCell {
             return
         }
         
-        task.stop()
-        self.stopSpin()
-
         // Stop any current animations
         self.outline.layer.removeAllAnimations()
         self.currentElapsed.layer.removeAllAnimations()
         
-        // Ensure state at end of animation
+        // Stop update
+        task.stop()
+        self.stopSpin()
+        
+        // Show elapsed
         self.currentElapsed.isHidden = false
-        self.outline.transform = CGAffineTransform(scaleX: 1, y: 1)
-        self.currentElapsed.center.x = self.elapsedTarget
         self.currentElapsed.transform = CGAffineTransform(scaleX: 1, y: 1)
         
+        // Show outline
+        self.outline.isHidden = false
+        self.outline.transform = CGAffineTransform(scaleX: 1, y: 1)
+        
         UIView.animate(withDuration: 0.5, animations: {
-            self.currentElapsed.center.x = self.outline.center.x
-            self.currentElapsed.transform = CGAffineTransform(scaleX: Epsilon, y: 1)
+            // Shrink elapsed
+            self.currentElapsed.transform = CGAffineTransform(translationX: self.outline.center.x - self.currentElapsed.center.x, y: 0).scaledBy(x: Epsilon, y: 1)
         }, completion: { finished in
             if !finished {
                 return
             }
             
+            // Hide shrunken view
             self.currentElapsed.isHidden = true
-
+            
             UIView.animate(withDuration: 0.5, animations: {
+                // Shrink outline
                 self.outline.transform = CGAffineTransform(scaleX: Epsilon, y: Epsilon)
             }, completion: { finished in
                 if !finished {
                     return
                 }
                 
+                // Hide shrunken view
                 self.outline.isHidden = true
-                self.currentElapsed.isHidden = true
             })
         })
     }
