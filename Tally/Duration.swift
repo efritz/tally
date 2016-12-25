@@ -10,11 +10,13 @@ import UIKit
 
 class Duration {
     let id: Int64
+    let task: TimedTask
     var first: Date
     var final: Date?
     
-    init(id: Int64, first: Date, final: Date? = nil) {
+    init(id: Int64, task: TimedTask, first: Date, final: Date? = nil) {
         self.id = id
+        self.task = task
         self.first = first
         self.final = final
     }

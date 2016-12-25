@@ -80,7 +80,9 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             return
         }
         
-        guard let indexPath = self.tableView.indexPathForRow(at: recognizer.location(in: self.tableView)) else {
+        let point = recognizer.location(in: self.tableView)
+        
+        guard let indexPath = self.tableView.indexPathForRow(at: point) else {
             return
         }
         
@@ -99,8 +101,41 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         }))
         
         controller.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
-            self.deleteTask (task: task, cell: cell)
+            self.deleteTask(task: task, cell: cell)
         }))
+        
+        controller.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        
+        self.present(controller, animated: true, completion: nil)
+    }
+    
+    func editDetail(recognizer: UILongPressGestureRecognizer) {
+        if recognizer.state != .began {
+            return
+        }
+        
+        let point = recognizer.location(in: self.tableView)
+        
+        guard let expandedIndex = self.expandedIndex, let indexPath = self.tableView.indexPathForRow(at: point) else {
+            return
+        }
+        
+        if indexPath.section != 0 {
+            return
+        }
+        
+        let task = self.tasks[expandedIndex]
+        let index = indexPath.row - expandedIndex - 1
+        let revIndex = self.tasks[expandedIndex].durations.count - index - 1
+        let cell = self.detailCellAt(index: revIndex)
+        
+        let controller = UIAlertController(title: "Edit Detail", message: "Edit Detail for '\(task.name)'", preferredStyle: .actionSheet)
+        
+        if !task.durations[revIndex].active() {
+            controller.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
+                self.deleteDuration(duration: task.durations[index], cell: cell, index: revIndex)
+            }))
+        }
         
         controller.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         
@@ -160,7 +195,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             let index = self.taskIndex(index: indexPath.row)
             
             for i in index..<self.tasks.count {
-                cellAt(index: i).moveDown()
+                self.cellAt(index: i).moveDown()
             }
             
             if let activeIndex = self.activeIndex {
@@ -183,6 +218,25 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             self.activeIndex = nil
             cell.stop()
         }
+    }
+    
+    private func deleteDuration(duration: Duration, cell: TaskDetailCell, index: Int) {
+        guard let expandedIndex = self.expandedIndex, let indexPath = self.tableView.indexPath(for: cell) else {
+            return
+        }
+        
+        for i in index..<duration.task.durations.count {
+            self.detailCellAt(index: i).moveDown()
+        }
+        
+        if !Database.instance.delete(duration: duration) {
+            // TODO - better recovery
+            print("Could not delete duration.")
+        }
+        
+        duration.task.durations.remove(at: index)
+        self.tableView.deleteRows(at: [indexPath], with: .fade)
+        self.cellAt(index: expandedIndex).update()
     }
     
     // Mark: - Timer State Change
@@ -312,6 +366,13 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         return self.tableView.cellForRow(at: IndexPath(row: self.realIndex(index: index), section: 0)) as! TaskCell
     }
     
+    private func detailCellAt(index: Int) -> TaskDetailCell {
+        let expandedIndex = self.expandedIndex!
+        let task = self.tasks[expandedIndex]
+        
+        return self.tableView.cellForRow(at: IndexPath(row: expandedIndex + task.durations.count - index, section: 0)) as! TaskDetailCell
+    }
+    
     private func realIndex(index: Int) -> Int {
         if let expandedIndex = self.expandedIndex {
             if index > expandedIndex {
@@ -399,6 +460,9 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             let revIndex = self.numberOfDetailCellsFor(index: expandedIndex) - index - 1
             
             cell.setup(task: self.tasks[expandedIndex], index: revIndex)
+            
+            // TDOO - move to delegate
+            cell.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(editDetail(recognizer:))))
         }
         
         return cell

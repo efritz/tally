@@ -33,4 +33,10 @@ class TaskDetailCell: UITableViewCell {
         
         self.elapsed.text = formatElapsed(task.durations[index].elapsed())
     }
+    
+    func moveDown() {
+        if let index = self.index {
+            self.index = index - 1
+        }
+    }
 }

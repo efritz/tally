@@ -53,9 +53,17 @@ class Database {
         if let db = self.db, let rows = try? db.prepare(self.tasks) {
             var results = [TimedTask]()
             for row in rows {
-                if let durations = self.durationsFor(taskId: row[self.taskId]) {
-                    results.append(TimedTask(id: row[self.taskId], name: row[self.name], durations: durations))
+                let task = TimedTask(id: row[self.taskId], name: row[self.name], durations: [])
+                
+                if let durations = self.durations(for: task) {
+                    for duration in durations {
+                        task.durations.append(duration)
+                    }
+                } else {
+                    return nil
                 }
+                
+                results.append(task)
             }
             
             return results.sorted { $0.elapsed() >= $1.elapsed() }
@@ -64,13 +72,13 @@ class Database {
         return nil
     }
     
-    func durationsFor(taskId: Int64) -> [Duration]? {
-        let query = self.durations.filter(self.taskId == taskId)
+    func durations(for task: TimedTask) -> [Duration]? {
+        let query = self.durations.filter(self.taskId == task.id)
         
         if let db = self.db, let rows = try? db.prepare(query) {
             var results = [Duration]()
             for row in rows {
-                results.append(Duration(id: row[self.durationId], first: row[self.first], final: row[self.final]))
+                results.append(Duration(id: row[self.durationId], task: task, first: row[self.first], final: row[self.final]))
             }
             
             return results.sorted { $0.first <= $1.first }
@@ -129,7 +137,7 @@ class Database {
         
         if let db = self.db {
             if let id = try? db.run(insert) {
-                return Duration(id: id, first: first)
+                return Duration(id: id, task: task, first: first)
             }
         }
         
@@ -143,6 +151,16 @@ class Database {
         if let db = self.db {
             if let _ = try? db.run(update) {
                 duration.final = final
+                return true
+            }
+        }
+        
+        return false
+    }
+    
+    func delete(duration: Duration) -> Bool {
+        if let db = self.db {
+            if let _ = try? db.run(self.durations.filter(self.durationId == duration.id).delete()) {
                 return true
             }
         }
