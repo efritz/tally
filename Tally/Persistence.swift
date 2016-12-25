@@ -58,8 +58,7 @@ class Database {
                 }
             }
             
-            // TODO - sort
-            return results
+            return results.sorted { $0.elapsed() >= $1.elapsed() }
         }
     
         return nil
@@ -74,8 +73,7 @@ class Database {
                 results.append(Duration(id: row[self.durationId], first: row[self.first], final: row[self.final]))
             }
             
-            // TODO - sort
-            return results
+            return results.sorted { $0.first <= $1.first }
         }
         
         return nil
