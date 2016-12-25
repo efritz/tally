@@ -104,7 +104,7 @@ class TaskCell: UITableViewCell {
         self.currentElapsed.isHidden = false
         self.currentElapsed.transform = CGAffineTransform(translationX: self.outline.center.x - self.currentElapsed.center.x, y: 0).scaledBy(x: Epsilon, y: 1)
         
-        UIView.animate(withDuration: 0.5, animations: {
+        UIView.animate(withDuration: 0.25, animations: {
             // Grow outline
             self.outline.transform = CGAffineTransform(scaleX: 1, y: 1)
         }, completion: { finished in
@@ -112,7 +112,7 @@ class TaskCell: UITableViewCell {
                 return
             }
             
-            UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseInOut, animations: {
+            UIView.animate(withDuration: 0.25, delay: 0, options: .curveEaseInOut, animations: {
                 // Grow elapsed
                 self.currentElapsed.transform = CGAffineTransform(scaleX: 1, y: 1)
             }, completion: nil)
@@ -140,7 +140,7 @@ class TaskCell: UITableViewCell {
         self.outline.isHidden = false
         self.outline.transform = CGAffineTransform(scaleX: 1, y: 1)
         
-        UIView.animate(withDuration: 0.5, animations: {
+        UIView.animate(withDuration: 0.25, animations: {
             // Shrink elapsed
             self.currentElapsed.transform = CGAffineTransform(translationX: self.outline.center.x - self.currentElapsed.center.x, y: 0).scaledBy(x: Epsilon, y: 1)
         }, completion: { finished in
@@ -151,7 +151,7 @@ class TaskCell: UITableViewCell {
             // Hide shrunken view
             self.currentElapsed.isHidden = true
             
-            UIView.animate(withDuration: 0.5, animations: {
+            UIView.animate(withDuration: 0.25, animations: {
                 // Shrink outline
                 self.outline.transform = CGAffineTransform(scaleX: Epsilon, y: Epsilon)
             }, completion: { finished in
