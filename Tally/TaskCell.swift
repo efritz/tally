@@ -51,17 +51,25 @@ class TaskCell: UITableViewCell {
         self.outline.backgroundColor = r
         self.currentElapsed.backgroundColor = r
         
+        // See if we were active when app started
+        if task.active() {
+            self.startAnimation()
+            delegate.started(index: index)
+        }
+        
         self.update()
         self.updateName()
     }
     
     func update() {
-        if let task = self.task {
-            elapsed.text = formatElapsed(task.elapsed())
-            
-            if task.active() {
-                self.currentElapsed.text = formatElapsed(task.currentElapsed())
-            }
+        guard let task = self.task else {
+            return
+        }
+        
+        elapsed.text = formatElapsed(task.elapsed())
+        
+        if task.active() {
+            self.currentElapsed.text = formatElapsed(task.currentElapsed())
         }
     }
     
@@ -88,12 +96,26 @@ class TaskCell: UITableViewCell {
             return
         }
         
+        task.start()
+        self.startAnimation()
+    }
+    
+    func stop() {
+        guard let task = self.task else {
+            return
+        }
+        
+        // Stop update
+        task.stop()
+        self.stopAnimation()
+    }
+    
+    private func startAnimation() {
         // Stop any current animations
         self.outline.layer.removeAllAnimations()
         self.currentElapsed.layer.removeAllAnimations()
         
-        // Start update
-        task.start()
+        // Begin spinner
         self.startSpin()
         
         // Shrink outline
@@ -119,17 +141,12 @@ class TaskCell: UITableViewCell {
         })
     }
     
-    func stop() {
-        guard let task = self.task else {
-            return
-        }
-        
+    private func stopAnimation() {
         // Stop any current animations
         self.outline.layer.removeAllAnimations()
         self.currentElapsed.layer.removeAllAnimations()
         
-        // Stop update
-        task.stop()
+        // Stop spinner
         self.stopSpin()
         
         // Show elapsed
