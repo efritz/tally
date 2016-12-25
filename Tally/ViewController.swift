@@ -348,7 +348,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         }
         
         self.expandedIndex = index
-        tableView.insertRows(at: paths, with: .fade)
+        self.tableView.insertRows(at: paths, with: .fade)
     }
     
     private func closeDetail() -> Int? {
