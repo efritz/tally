@@ -261,6 +261,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         
         if let index = self.activeIndex {
             self.cellAt(index: index).stop()
+            self.updateCell(index: index)
         }
         
         self.activeIndex = index
