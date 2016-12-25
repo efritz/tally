@@ -234,8 +234,15 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             print("Could not delete duration.")
         }
         
-        duration.task.durations.remove(at: index)
-        self.tableView.deleteRows(at: [indexPath], with: .fade)
+        let task = duration.task
+        task.durations.remove(at: index)
+        
+        if task.durations.count == 0 {
+            self.tableView.reloadRows(at: [indexPath], with: .fade)
+        } else {
+            self.tableView.deleteRows(at: [indexPath], with: .fade)
+        }
+        
         self.cellAt(index: expandedIndex).update()
     }
     
