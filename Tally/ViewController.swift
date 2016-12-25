@@ -279,15 +279,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             return
         }
         
-        cellAt(index: index).update()
-        
-        if let expandedIndex = self.expandedIndex {
-            if expandedIndex == index {
-                if let cell = self.tableView.cellForRow(at: IndexPath(row: index + 1, section: 0)) as? TaskDetailCell {
-                    cell.update()
-                }
-            }
-        }
+        updateCell(index: index)
 
         var newIndex = index
         while newIndex > 0 {
@@ -335,6 +327,18 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         }
         
         self.activeIndex = newIndex
+    }
+    
+    private func updateCell(index: Int) {
+        self.cellAt(index: index).update()
+        
+        if let expandedIndex = self.expandedIndex {
+            if expandedIndex == index {
+                if let cell = self.tableView.cellForRow(at: IndexPath(row: index + 1, section: 0)) as? TaskDetailCell {
+                    cell.update()
+                }
+            }
+        }
     }
     
     private func showDetail(index: Int) {
