@@ -244,6 +244,14 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         }
         
         self.cellAt(index: expandedIndex).update()
+        
+        if let taskIndex = self.tasks.index(where: { $0.id == task.id }) {
+            let newIndex = reorderDown(index: taskIndex)
+            
+            if let activeIndex = self.activeIndex, activeIndex == taskIndex {
+                self.activeIndex = newIndex
+            }
+        }
     }
     
     // Mark: - Timer State Change
@@ -290,7 +298,10 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         }
         
         updateCell(index: index)
-
+        self.activeIndex = self.reorderUp(index: index)
+    }
+    
+    private func reorderUp(index: Int) -> Int {
         var newIndex = index
         while newIndex > 0 {
             let a = self.tasks[index].elapsed()
@@ -304,7 +315,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         }
         
         if index == newIndex {
-            return
+            return index
         }
         
         var shouldExpand: Int? = nil
@@ -336,7 +347,56 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             self.showDetail(index: shouldExpand)
         }
         
-        self.activeIndex = newIndex
+        return newIndex
+    }
+    
+    private func reorderDown(index: Int) -> Int {
+        var newIndex = index
+        while newIndex < self.tasks.count - 1 {
+            let a = self.tasks[index].elapsed()
+            let b = self.tasks[newIndex + 1].elapsed()
+            
+            if !compareElapsed(b, a) {
+                break
+            }
+            
+            newIndex = newIndex + 1
+        }
+        
+        if index == newIndex {
+            return index
+        }
+        
+        var shouldExpand: Int? = nil
+        if let expandedIndex = self.expandedIndex {
+            if index <= expandedIndex && expandedIndex <= newIndex {
+                let _ = self.closeDetail()
+                
+                if expandedIndex == index {
+                    shouldExpand = newIndex
+                } else {
+                    shouldExpand = expandedIndex - 1
+                }
+            }
+        }
+        
+        for i in (index+1)...newIndex {
+            self.cellAt(index: i).moveDown()
+            self.cellAt(index: index).moveUp()
+            
+            let j = i - 1
+            let temp = self.tasks[j]
+            self.tasks[j] = self.tasks[i]
+            self.tasks[i] = temp
+        }
+        
+        self.tableView.moveRow(at: IndexPath(row: self.realIndex(index: index), section: 0), to: IndexPath(row: self.realIndex(index: newIndex), section: 0))
+        
+        if let shouldExpand = shouldExpand {
+            self.showDetail(index: shouldExpand)
+        }
+        
+        return newIndex
     }
     
     private func updateCell(index: Int) {
