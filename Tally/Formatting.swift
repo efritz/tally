@@ -74,7 +74,7 @@ func formatElapsed(_ seconds: Int) -> String {
 func formatTime(_ date: Date?) -> String {
     if let date = date {
         let formatter = DateFormatter()
-        formatter.dateFormat = "MM/dd/yy hh:mm:ssa"
+        formatter.dateFormat = "MM/dd hh:mm:ssa"
         
         return formatter.string(from: date)
     }
