@@ -105,7 +105,6 @@ class TaskCell: UITableViewCell {
             return
         }
         
-        // Stop update
         task.stop()
         self.stopAnimation()
     }
