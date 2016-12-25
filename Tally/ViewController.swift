@@ -249,16 +249,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     // Mark: - Timer State Change
 
     func started(index: Int) {
-        if let index = self.activeIndex {
-            self.cellAt(index: index).stop()
-        } else {
-            self.timer = Timer.scheduledTimer(withTimeInterval: 0.33, repeats: true) { _ in
-                self.update()
-            }
-        }
-        
-        self.activeIndex = index
-        
         if let expandedIndex = self.expandedIndex {
             if expandedIndex == index {
                 if self.tasks[index].durations.count == 1 {
@@ -266,6 +256,18 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
                 } else {
                     self.tableView.insertRows(at: [IndexPath(row: index + 1, section: 0)], with: .fade)
                 }
+            }
+        }
+        
+        if let index = self.activeIndex {
+            self.cellAt(index: index).stop()
+        }
+        
+        self.activeIndex = index
+        
+        if self.timer == nil {
+            self.timer = Timer.scheduledTimer(withTimeInterval: 0.33, repeats: true) { _ in
+                self.update()
             }
         }
     }
