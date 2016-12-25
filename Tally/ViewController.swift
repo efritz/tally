@@ -92,7 +92,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         
         let index = self.taskIndex(index: indexPath.row)
         let task = self.tasks[index]
-        let cell = cellAt(index: index)
+        let cell = self.cellAt(index: index)
         
         let controller = UIAlertController(title: "Edit Task", message: "Edit Task '\(task.name)'", preferredStyle: .actionSheet)
         
@@ -243,7 +243,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
 
     func started(index: Int) {
         if let index = self.activeIndex {
-            cellAt(index: index).stop()
+            self.cellAt(index: index).stop()
         } else {
             self.timer = Timer.scheduledTimer(withTimeInterval: 0.33, repeats: true) { _ in
                 self.update()
@@ -319,8 +319,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         }
         
         for i in (newIndex..<index).reversed() {
-            cellAt(index: i).moveUp()
-            cellAt(index: index).moveDown()
+            self.cellAt(index: i).moveUp()
+            self.cellAt(index: index).moveDown()
             
             let j = i + 1
             let temp = self.tasks[j]
