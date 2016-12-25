@@ -30,11 +30,15 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
 
         // Remove separators betewen empty cells
         self.tableView.tableFooterView = UIView(frame: CGRect.zero)
-
-        // TODO - this is test stuff
-        tasks.append(TimedTask(name: "t1"))
-        tasks.append(TimedTask(name: "t2"))
-        tasks.append(TimedTask(name: "t3"))
+        
+        if let tasks = Database.instance.allTasks() {
+            for task in tasks {
+                self.tasks.append(task)
+            }
+        } else {
+            // TODO - better recovery
+            print("Could not retrieve tasks.")
+        }
     }
     
     override func didReceiveMemoryWarning() {
@@ -54,10 +58,13 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
                     return
                 }
                 
-                let index = self.tasks.count
-                self.tasks.append(TimedTask(name: name))
-                
-                self.tableView.insertRows(at: [IndexPath(row: self.realIndex(index: index), section: 0)], with: .right)
+                if let task = Database.instance.createTask(name: name) {
+                    self.tasks.append(task)
+                    self.tableView.insertRows(at: [IndexPath(row: self.realIndex(index: self.tasks.count - 1), section: 0)], with: .right)
+                } else {
+                    // TODO - better recovery
+                    print("Could not create task.")
+                }
             }
         }))
         
@@ -135,6 +142,11 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
                 
                 task.name = name
                 cell.updateName()
+                
+                if !Database.instance.update(task: task, name: name) {
+                    // TODO - better recovery
+                    print("Could not update task name.")
+                }
             }
         }))
         
@@ -156,7 +168,12 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
                     self.activeIndex = activeIndex - 1
                 }
             }
-        
+            
+            if !Database.instance.delete(task: task) {
+                // TODO - better recovery
+                print("Could not delete task.")
+            }
+            
             let _ = self.closeDetail()
             self.tasks.remove(at: index)
             self.tableView.deleteRows(at: [indexPath], with: .fade)

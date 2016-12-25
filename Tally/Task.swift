@@ -8,41 +8,26 @@
 
 import UIKit
 
-class Duration {
-    var first: Date
-    var final: Date?
-    
-    init() {
-        self.first = Date()
-    }
-    
-    func stop() {
-        if self.final == nil {
-            self.final = Date()
-        }
-    }
-    
-    func active() -> Bool {
-        return self.final == nil
-    }
-    
-    func elapsed() -> Int {
-        return Int((self.final ?? Date()).timeIntervalSince(self.first))
-    }
-}
-
 class TimedTask {
+    let id: Int64
     var name: String
     var durations: [Duration]
     
-    init(name: String) {
+    init(id: Int64, name: String, durations: [Duration] = []) {
+        self.id = id
         self.name = name
-        self.durations = []
+        self.durations = durations
     }
     
     func start() {
-        self.durations.last?.stop()
-        self.durations.append(Duration())
+        self.stop()
+        
+        if let duration = Database.instance.createDuration(for: self) {
+            self.durations.append(duration)
+        } else {
+            // TODO - better recovery
+            print("Could not create duration.")
+        }
     }
     
     func stop() {
