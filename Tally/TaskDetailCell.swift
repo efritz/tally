@@ -12,6 +12,7 @@ class TaskDetailCell: UITableViewCell {
     @IBOutlet weak var first: UILabel!
     @IBOutlet weak var final: UILabel!
     @IBOutlet weak var elapsed: UILabel!
+    @IBOutlet weak var note: UILabel!
     
     private var task: TimedTask?
     private var index: Int?
@@ -30,8 +31,8 @@ class TaskDetailCell: UITableViewCell {
         
         self.first.text = formatTime(task.durations[index].first)
         self.final.text = formatTime(task.durations[index].final)
-        
         self.elapsed.text = formatElapsed(task.durations[index].elapsed())
+        self.note.text = task.durations[index].note ?? ""
     }
     
     func moveDown() {

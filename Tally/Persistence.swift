@@ -21,6 +21,7 @@ class Database {
     private let name = Expression<String>("name")
     private let first = Expression<Date>("first")
     private let final = Expression<Date?>("final")
+    private let note = Expression<String?>("note")
 
     private init() {
         let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
@@ -43,6 +44,7 @@ class Database {
                 table.column(self.taskId, references: self.tasks, self.taskId)
                 table.column(self.first)
                 table.column(self.final)
+                table.column(self.note)
             }))
         } catch let ex {
             print("Unable to create table (\(ex))")
@@ -78,7 +80,7 @@ class Database {
         if let db = self.db, let rows = try? db.prepare(query) {
             var results = [Duration]()
             for row in rows {
-                results.append(Duration(id: row[self.durationId], task: task, first: row[self.first], final: row[self.final]))
+                results.append(Duration(id: row[self.durationId], task: task, first: row[self.first], final: row[self.final], note: row[self.note]))
             }
             
             return results.sorted { $0.first <= $1.first }
@@ -144,13 +146,26 @@ class Database {
         return nil
     }
     
-    func updateDuration(duration: Duration) -> Bool {
+    func update(duration: Duration) -> Bool {
         let final = Date()
         let update = self.durations.filter(self.durationId == duration.id).update(self.final <- final)
         
         if let db = self.db {
             if let _ = try? db.run(update) {
                 duration.final = final
+                return true
+            }
+        }
+        
+        return false
+    }
+    
+    func update(duration: Duration, withNote note: String) -> Bool {
+        let update = self.durations.filter(self.durationId == duration.id).update(self.note <- note)
+        
+        if let db = self.db {
+            if let _ = try? db.run(update) {
+                duration.note = note
                 return true
             }
         }

@@ -13,12 +13,14 @@ class Duration {
     let task: TimedTask
     var first: Date
     var final: Date?
+    var note: String?
     
-    init(id: Int64, task: TimedTask, first: Date, final: Date? = nil) {
+    init(id: Int64, task: TimedTask, first: Date, final: Date? = nil, note: String? = nil) {
         self.id = id
         self.task = task
         self.first = first
         self.final = final
+        self.note = note
     }
     
     func stop() {
@@ -26,7 +28,7 @@ class Duration {
             return
         }
         
-        if !Database.instance.updateDuration(duration: self) {
+        if !Database.instance.update(duration: self) {
             // TODO - better recovery
             print("Could not update duration.")
         }

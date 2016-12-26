@@ -131,9 +131,13 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         
         let controller = UIAlertController(title: "Edit Detail", message: "Edit Detail for '\(task.name)'", preferredStyle: .actionSheet)
         
+        controller.addAction(UIAlertAction(title: "Add Note", style: .default, handler: { _ in
+            self.renameDuration(duration: task.durations[revIndex], cell: cell, index: revIndex)
+        }))
+        
         if !task.durations[revIndex].active() {
             controller.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
-                self.deleteDuration(duration: task.durations[index], cell: cell, index: revIndex)
+                self.deleteDuration(duration: task.durations[revIndex], cell: cell, index: revIndex)
             }))
         }
         
@@ -218,6 +222,35 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             self.activeIndex = nil
             cell.stop()
         }
+    }
+    
+    private func renameDuration(duration: Duration, cell: TaskDetailCell, index: Int) {
+        let controller = UIAlertController(title: "Add Note", message: "What do you want to call it?", preferredStyle: .alert)
+        
+        controller.addTextField(configurationHandler: { field in
+            field.text = duration.note ?? ""
+        })
+        
+        controller.addAction(UIAlertAction(title: "Rename", style: .default, handler: { _ in
+            if let field = controller.textFields?.first, let note = field.text {
+                if note == "" {
+                    duration.note = nil
+                } else {
+                    duration.note = note
+                }
+                
+                cell.update()
+                
+                if !Database.instance.update(duration: duration, withNote: note) {
+                    // TODO - better recovery
+                    print("Could not update duration note.")
+                }
+            }
+        }))
+        
+        controller.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        
+        self.present(controller, animated: true, completion: nil)
     }
     
     private func deleteDuration(duration: Duration, cell: TaskDetailCell, index: Int) {
