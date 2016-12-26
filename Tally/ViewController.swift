@@ -138,7 +138,14 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         
         let controller = UIAlertController(title: "Edit Detail", message: "Edit Detail for '\(task.name)'", preferredStyle: .actionSheet)
         
-        controller.addAction(UIAlertAction(title: "Add Note", style: .default, handler: { _ in
+        var title: String
+        if task.durations[revIndex].note == nil {
+            title = "Add Note"
+        } else {
+            title = "Update Note"
+        }
+        
+        controller.addAction(UIAlertAction(title: title, style: .default, handler: { _ in
             self.renameDuration(duration: task.durations[revIndex], cell: cell, index: revIndex)
         }))
         
@@ -233,7 +240,14 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
     
     private func renameDuration(duration: Duration, cell: TaskDetailCell, index: Int) {
-        let controller = UIAlertController(title: "Add Note", message: "What do you want to call it?", preferredStyle: .alert)
+        var title: String
+        if duration.note == nil {
+            title = "Add Note"
+        } else {
+            title = "Update Note"
+        }
+        
+        let controller = UIAlertController(title: title, message: "What do you want to call it?", preferredStyle: .alert)
         
         controller.addTextField(configurationHandler: { field in
             field.text = duration.note ?? ""
