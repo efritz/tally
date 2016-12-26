@@ -223,6 +223,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             let _ = self.closeDetail()
             self.tasks.remove(at: index)
             self.tableView.deleteRows(at: [indexPath], with: .fade)
+            self.updateTotalElapsed()
         }
         
         if task.active() {
