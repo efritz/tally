@@ -24,7 +24,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     private var timer: Timer?
 
     @IBOutlet weak var tableView: UITableView!
-
+    @IBOutlet weak var totalElapsed: UILabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -39,10 +40,16 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             // TODO - better recovery
             print("Could not retrieve tasks.")
         }
+        
+        self.updateTotalElapsed()
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
+    }
+    
+    private func updateTotalElapsed() {
+        self.totalElapsed.text = formatElapsed(self.tasks.map({ $0.elapsed() }).reduce(0, +))
     }
     
     // Mark: - Task Creation
@@ -277,6 +284,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         }
         
         self.cellAt(index: expandedIndex).update()
+        self.updateTotalElapsed()
         
         if let taskIndex = self.tasks.index(where: { $0.id == task.id }) {
             let newIndex = reorderDown(index: taskIndex)
@@ -331,6 +339,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         }
         
         updateCell(index: index)
+        self.updateTotalElapsed()
         self.activeIndex = self.reorderUp(index: index)
     }
     

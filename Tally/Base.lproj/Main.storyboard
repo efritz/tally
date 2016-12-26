@@ -29,7 +29,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </stackView>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" allowsSelection="NO" rowHeight="66" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="ohW-Rs-YDy">
-                                <rect key="frame" x="0.0" y="20" width="375" height="647"/>
+                                <rect key="frame" x="0.0" y="40" width="375" height="627"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="task" id="MMS-gY-A9I" customClass="TaskCell" customModule="Tally" customModuleProvider="target">
@@ -268,17 +268,26 @@
                                     <outlet property="delegate" destination="BYZ-38-t0r" id="FoK-ig-bxY"/>
                                 </connections>
                             </tableView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Fu0-ep-evz">
+                                <rect key="frame" x="166" y="25" width="42" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="ohW-Rs-YDy" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" id="59h-Co-Mbw"/>
-                            <constraint firstItem="ohW-Rs-YDy" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="HDJ-jM-Zhe"/>
+                            <constraint firstItem="ohW-Rs-YDy" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="20" id="HDJ-jM-Zhe"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="ohW-Rs-YDy" secondAttribute="bottom" id="Koz-d6-eED"/>
                             <constraint firstItem="ohW-Rs-YDy" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="SmF-6J-mFf"/>
+                            <constraint firstItem="Fu0-ep-evz" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="cz3-LL-nAZ"/>
+                            <constraint firstItem="Fu0-ep-evz" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="5" id="kQf-SS-eni"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="tableView" destination="ohW-Rs-YDy" id="zRp-on-REo"/>
+                        <outlet property="totalElapsed" destination="Fu0-ep-evz" id="he6-kC-0WB"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
