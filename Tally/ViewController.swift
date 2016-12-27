@@ -255,10 +255,10 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         var message: String
         
         if duration.note == nil {
-            title = "Add Note to Entry #\(index + 1) of \(duration.task.name)"
+            title = "Add Note to Entry #\(index + 1) of Task \(duration.task.name)"
             message = "What would you like to say?"
         } else {
-            title = "Update Note to Entry #\(index + 1) of \(duration.task.name)"
+            title = "Update Note to Entry #\(index + 1) of Task \(duration.task.name)"
             message = "What would you rather say?"
         }
         
