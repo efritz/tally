@@ -21,6 +21,11 @@ class TaskDetailCell: UITableViewCell {
         self.task = task
         self.index = index
         
+        // Set colors (UILabel background not animateable)
+        self.elapsed.backgroundColor = UIColor.clear
+        self.elapsed.layer.backgroundColor = task.color.cgColor
+        
+        // Set content immediately
         self.update()
     }
     

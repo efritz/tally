@@ -56,6 +56,7 @@ class TaskCell: UITableViewCell {
             delegate.started(index: index)
         }
         
+        // Set content immediately
         self.update()
         self.updateName()
     }
