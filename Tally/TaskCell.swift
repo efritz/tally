@@ -45,11 +45,10 @@ class TaskCell: UITableViewCell {
         self.currentElapsed.layer.cornerRadius = 5
         self.currentElapsed.clipsToBounds = true
         
-        // Create colors
-        let r = makeRandomColor(mix: UIColor.white)
-        self.elapsed.backgroundColor = r
-        self.outline.backgroundColor = r
-        self.currentElapsed.backgroundColor = r
+        // Set colors
+        self.elapsed.backgroundColor = task.color
+        self.outline.backgroundColor = task.color
+        self.currentElapsed.backgroundColor = task.color
         
         // See if we were active when app started
         if task.active() {

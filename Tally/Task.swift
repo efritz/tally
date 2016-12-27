@@ -12,11 +12,13 @@ class TimedTask {
     let id: Int64
     var name: String
     var durations: [Duration]
+    var color: UIColor
     
-    init(id: Int64, name: String, durations: [Duration] = []) {
+    init(id: Int64, name: String, durations: [Duration] = [], color: UIColor = UIColor.white) {
         self.id = id
         self.name = name
         self.durations = durations
+        self.color = color
     }
     
     func start() {

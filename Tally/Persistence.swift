@@ -6,8 +6,8 @@
 //  Copyright © 2016 Eric Fritz. All rights reserved.
 //
 
+import UIKit
 import SQLite
-import Foundation
 
 class Database {
     static let instance = Database()
@@ -55,7 +55,7 @@ class Database {
         if let db = self.db, let rows = try? db.prepare(self.tasks) {
             var results = [TimedTask]()
             for row in rows {
-                let task = TimedTask(id: row[self.taskId], name: row[self.name], durations: [])
+                let task = TimedTask(id: row[self.taskId], name: row[self.name], durations: [], color: makeRandomColor(mix: UIColor.white))
                 
                 if let durations = self.durations(for: task) {
                     for duration in durations {
@@ -94,7 +94,7 @@ class Database {
         
         if let db = self.db {
             if let id = try? db.run(insert) {
-                return TimedTask(id: id, name: name)
+                return TimedTask(id: id, name: name, color: makeRandomColor(mix: UIColor.white))
             }
         }
         
