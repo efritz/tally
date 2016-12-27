@@ -233,7 +233,12 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
                 print("Could not delete task.")
             }
             
-            let _ = self.closeDetail()
+            if let expandedIndex  = self.expandedIndex {
+                if expandedIndex == index {
+                    let _ = self.closeDetail()
+                }
+            }
+            
             self.tasks.remove(at: index)
             self.tableView.deleteRows(at: [indexPath], with: .fade)
             self.updateTotalElapsed()
