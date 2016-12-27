@@ -23,6 +23,17 @@ class Duration {
         self.note = note
     }
     
+    func intersects(first: Date, final: Date?) -> Bool {
+        let a = self.first <= first ? self.final : final
+        let b = self.first <= first ? first : self.first
+        
+        if let c = a, c <= b {
+            return false
+        }
+        
+        return true
+    }
+    
     func stop() {
         if self.final != nil {
             return

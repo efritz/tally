@@ -79,15 +79,15 @@ class TaskCell: UITableViewCell {
         }
     }
     
-    func moveDown() {
-        if let index = self.index {
-            self.index = index - 1
-        }
-    }
-    
     func moveUp() {
         if let index = self.index {
             self.index = index + 1
+        }
+    }
+    
+    func moveDown() {
+        if let index = self.index {
+            self.index = index - 1
         }
     }
     

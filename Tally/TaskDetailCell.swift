@@ -39,6 +39,12 @@ class TaskDetailCell: UITableViewCell {
         self.note.text = task.durations[index].note ?? ""
     }
     
+    func moveUp() {
+        if let index = self.index {
+            self.index = index + 1
+        }
+    }
+    
     func moveDown() {
         if let index = self.index {
             self.index = index - 1

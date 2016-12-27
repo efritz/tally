@@ -134,12 +134,15 @@ class Database {
     }
     
     func createDuration(for task: TimedTask) -> Duration? {
-        let first = Date()
-        let insert = self.durations.insert(self.taskId <- task.id, self.first <- first)
+        return self.createDuration(for: task, first: Date())
+    }
+    
+    func createDuration(for task: TimedTask, first: Date, final: Date? = nil) -> Duration? {
+        let insert = self.durations.insert(self.taskId <- task.id, self.first <- first, self.final <- final)
         
         if let db = self.db {
             if let id = try? db.run(insert) {
-                return Duration(id: id, task: task, first: first)
+                return Duration(id: id, task: task, first: first, final: final)
             }
         }
         

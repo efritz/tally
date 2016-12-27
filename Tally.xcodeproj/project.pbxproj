@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		E710D6161E0B941F0009C12E /* Timer.png in Resources */ = {isa = PBXBuildFile; fileRef = E710D6151E0B941F0009C12E /* Timer.png */; };
+		E7169FDA1E12D89100821912 /* AddTimeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7169FD91E12D89100821912 /* AddTimeViewController.swift */; };
 		E72678091E0C79A80078CE5A /* New.png in Resources */ = {isa = PBXBuildFile; fileRef = E72678081E0C79A80078CE5A /* New.png */; };
 		E7C9CF3C1E08FD12003D9ABC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7C9CF3B1E08FD12003D9ABC /* AppDelegate.swift */; };
 		E7C9CF3E1E08FD12003D9ABC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7C9CF3D1E08FD12003D9ABC /* ViewController.swift */; };
@@ -101,6 +102,7 @@
 
 /* Begin PBXFileReference section */
 		E710D6151E0B941F0009C12E /* Timer.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Timer.png; path = Images/Timer.png; sourceTree = "<group>"; };
+		E7169FD91E12D89100821912 /* AddTimeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddTimeViewController.swift; sourceTree = "<group>"; };
 		E72678081E0C79A80078CE5A /* New.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = New.png; path = Images/New.png; sourceTree = "<group>"; };
 		E7C9CF381E08FD12003D9ABC /* Tally.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tally.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E7C9CF3B1E08FD12003D9ABC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -132,6 +134,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E7169FE11E12D8A400821912 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				E7C9CF3D1E08FD12003D9ABC /* ViewController.swift */,
+				E7169FD91E12D89100821912 /* AddTimeViewController.swift */,
+			);
+			name = Controllers;
+			sourceTree = "<group>";
+		};
 		E7C9CF2F1E08FD12003D9ABC = {
 			isa = PBXGroup;
 			children = (
@@ -152,12 +163,12 @@
 		E7C9CF3A1E08FD12003D9ABC /* Tally */ = {
 			isa = PBXGroup;
 			children = (
-				E7E32F1C1E0F4F2A0054AD12 /* Data */,
+				E7169FE11E12D8A400821912 /* Controllers */,
+				E7E32F1C1E0F4F2A0054AD12 /* Data Model */,
 				E7E32EED1E0E2B8C0054AD12 /* Cells */,
 				E7E32EF61E0E2C240054AD12 /* Util */,
 				E7DE9E521E0A3FF9009BA639 /* Images */,
 				E7C9CF3B1E08FD12003D9ABC /* AppDelegate.swift */,
-				E7C9CF3D1E08FD12003D9ABC /* ViewController.swift */,
 				E7C9CF3F1E08FD12003D9ABC /* Main.storyboard */,
 				E7C9CF441E08FD12003D9ABC /* LaunchScreen.storyboard */,
 				E7C9CF421E08FD12003D9ABC /* Assets.xcassets */,
@@ -208,14 +219,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		E7E32F1C1E0F4F2A0054AD12 /* Data */ = {
+		E7E32F1C1E0F4F2A0054AD12 /* Data Model */ = {
 			isa = PBXGroup;
 			children = (
 				E7E32EE91E0E2B410054AD12 /* Task.swift */,
 				E7E32F1D1E0F4F3A0054AD12 /* Duration.swift */,
 				E7E32F1A1E0E39570054AD12 /* Persistence.swift */,
 			);
-			name = Data;
+			name = "Data Model";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -360,6 +371,7 @@
 				E7E32EEC1E0E2B890054AD12 /* NewTaskCell.swift in Sources */,
 				E7E32F1E1E0F4F3B0054AD12 /* Duration.swift in Sources */,
 				E7E32EEA1E0E2B410054AD12 /* Task.swift in Sources */,
+				E7169FDA1E12D89100821912 /* AddTimeViewController.swift in Sources */,
 				E7C9CF3C1E08FD12003D9ABC /* AppDelegate.swift in Sources */,
 				E7E32EF31E0E2BE70054AD12 /* Formatting.swift in Sources */,
 				E7E32EEF1E0E2B9A0054AD12 /* TaskCell.swift in Sources */,

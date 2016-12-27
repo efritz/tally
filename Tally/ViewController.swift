@@ -17,15 +17,16 @@ protocol TimerStateChangedDelegate {
     func stopped(index: Int)
 }
 
-class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, TimerStateChangedDelegate, NewTaskDelegate {
+class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, TimerStateChangedDelegate, NewTaskDelegate, TimeAddedDelegate {
+    @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var totalElapsed: UILabel!
+    
     private var tasks = [TimedTask]()
     private var activeIndex: Int?
     private var expandedIndex: Int?
     private var timer: Timer?
+    private var segueTask: TimedTask?
 
-    @IBOutlet weak var tableView: UITableView!
-    @IBOutlet weak var totalElapsed: UILabel!
-    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -102,6 +103,10 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         let cell = self.cellAt(index: index)
         
         let controller = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        controller.addAction(UIAlertAction(title: "Add Time to Task", style: .default, handler: { _ in
+            self.addTime(task: task, cell: cell)
+        }))
         
         controller.addAction(UIAlertAction(title: "Rename Task", style: .default, handler: { _ in
             self.renameTask(task: task, cell: cell)
@@ -184,6 +189,11 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         }
         
         self.showDetail(index: taskIndex)
+    }
+    
+    private func addTime(task: TimedTask, cell: TaskCell) {
+        self.segueTask = task
+        self.performSegue(withIdentifier: "addTime", sender: nil)
     }
     
     private func renameTask(task: TimedTask, cell: TaskCell) {
@@ -320,6 +330,60 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         }
     }
     
+    // Mark: - Segues
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "addTime" {
+            if let navController = segue.destination as? UINavigationController {
+                if let task = self.segueTask, let controller = navController.topViewController as? AddTimeViewController {
+                    controller.task = task
+                    controller.delegate = self
+                }
+            }
+        }
+    }
+    
+    func addTime(first: Date, final: Date) {
+        guard let task = self.segueTask else {
+            return
+        }
+        
+        if let duration = Database.instance.createDuration(for: task, first: first, final: final) {
+            var i = 0
+            while i < task.durations.count && first >= task.durations[i].first {
+                i = i + 1
+            }
+            
+            // Insert duration sorted by
+            task.durations.insert(duration, at: i)
+            
+            if let index = self.tasks.index(where: { $0.id == task.id }) {
+                // Update elapsed counts
+                self.updateCell(index: index)
+                
+                // If expanded, insert new row
+                if let expandedIndex = self.expandedIndex, expandedIndex == index {
+                    let durationIndex = self.realIndex(index: index) + task.durations.count - i
+                        
+                    if task.durations.count == 1 {
+                        self.tableView.reloadRows(at: [IndexPath(row: durationIndex, section: 0)], with: .fade)
+                    } else {
+                        self.tableView.insertRows(at: [IndexPath(row: durationIndex, section: 0)], with: .fade)
+                        
+                        i = i + 1
+                        while i < task.durations.count {
+                            detailCellAt(index: i).moveUp()
+                            i = i + 1
+                        }
+                    }
+                }
+            }
+        } else {
+            // TODO - better recovery
+            print("Could not create task detail.")
+        }
+    }
+
     // Mark: - Timer State Change
 
     func started(index: Int) {
