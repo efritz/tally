@@ -55,7 +55,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     // Mark: - Task Creation
 
     func makeNewTask() {
-        let controller = UIAlertController(title: "New Task", message: "What do you want to call it?", preferredStyle: .alert)
+        let controller = UIAlertController(title: "Create Task", message: "What would you like to call it?", preferredStyle: .alert)
         
         controller.addTextField(configurationHandler: nil)
         
@@ -101,13 +101,13 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         let task = self.tasks[index]
         let cell = self.cellAt(index: index)
         
-        let controller = UIAlertController(title: "Edit Task", message: "Edit Task '\(task.name)'", preferredStyle: .actionSheet)
+        let controller = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        controller.addAction(UIAlertAction(title: "Rename", style: .default, handler: { _ in
+        controller.addAction(UIAlertAction(title: "Rename Task", style: .default, handler: { _ in
             self.renameTask(task: task, cell: cell)
         }))
         
-        controller.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
+        controller.addAction(UIAlertAction(title: "Delete Task", style: .destructive, handler: { _ in
             self.deleteTask(task: task, cell: cell)
         }))
         
@@ -136,14 +136,20 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         let revIndex = self.tasks[expandedIndex].durations.count - index - 1
         let cell = self.detailCellAt(index: revIndex)
         
-        let controller = UIAlertController(title: "Edit Detail", message: "Edit Detail for '\(task.name)'", preferredStyle: .actionSheet)
-        
         var title: String
+        var message: String? = nil
+        
         if task.durations[revIndex].note == nil {
             title = "Add Note"
         } else {
             title = "Update Note"
         }
+        
+        if task.durations[revIndex].active() {
+            message = "Note: An active task detail cannot be deleted."
+        }
+        
+        let controller = UIAlertController(title: nil, message: message, preferredStyle: .actionSheet)
         
         controller.addAction(UIAlertAction(title: title, style: .default, handler: { _ in
             self.renameDuration(duration: task.durations[revIndex], cell: cell, index: revIndex)
@@ -181,13 +187,13 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
     
     private func renameTask(task: TimedTask, cell: TaskCell) {
-        let controller = UIAlertController(title: "Rename Task", message: "What do you want to call it?", preferredStyle: .alert)
+        let controller = UIAlertController(title: "Rename Task \(task.name)", message: "What would you rather call it?", preferredStyle: .alert)
         
         controller.addTextField(configurationHandler: { field in
             field.text = task.name
         })
         
-        controller.addAction(UIAlertAction(title: "Rename", style: .default, handler: { _ in
+        controller.addAction(UIAlertAction(title: "Ok", style: .default, handler: { _ in
             if let field = controller.textFields?.first, let name = field.text {
                 if name == "" {
                     return
@@ -241,31 +247,30 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     
     private func renameDuration(duration: Duration, cell: TaskDetailCell, index: Int) {
         var title: String
+        var message: String
+        
         if duration.note == nil {
-            title = "Add Note"
+            title = "Add Note to Entry #\(index + 1) of \(duration.task.name)"
+            message = "What would you like to say?"
         } else {
-            title = "Update Note"
+            title = "Update Note to Entry #\(index + 1) of \(duration.task.name)"
+            message = "What would you rather say?"
         }
         
-        let controller = UIAlertController(title: title, message: "What do you want to call it?", preferredStyle: .alert)
+        let controller = UIAlertController(title: title, message: message, preferredStyle: .alert)
         
         controller.addTextField(configurationHandler: { field in
             field.text = duration.note ?? ""
         })
         
-        controller.addAction(UIAlertAction(title: "Rename", style: .default, handler: { _ in
+        controller.addAction(UIAlertAction(title: "Ok", style: .default, handler: { _ in
             if let field = controller.textFields?.first, let note = field.text {
-                if note == "" {
-                    duration.note = nil
-                } else {
-                    duration.note = note
-                }
-                
+                duration.note = note == "" ? nil : note
                 cell.update()
                 
                 if !Database.instance.update(duration: duration, withNote: note) {
                     // TODO - better recovery
-                    print("Could not update duration note.")
+                    print("Could not update task detail note.")
                 }
             }
         }))
