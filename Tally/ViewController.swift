@@ -363,7 +363,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             return
         }
         
-        updateCell(index: index)
+        self.updateCell(index: index)
         self.updateTotalElapsed()
         self.activeIndex = self.reorderUp(index: index)
     }
