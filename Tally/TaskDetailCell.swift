@@ -34,7 +34,7 @@ class TaskDetailCell: UITableViewCell {
             return
         }
         
-        self.first.text = formatTime(task.durations[index].first)
+        self.first.text = "at " + formatTime(task.durations[index].first)
         self.elapsed.text = formatElapsed(task.durations[index].elapsed())
         self.note.text = task.durations[index].note ?? ""
     }
