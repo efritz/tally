@@ -12,9 +12,9 @@ protocol TimeAddedDelegate {
     func addTime(first: Date, final: Date)
 }
 
-class AddTimeViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate {
+class AddTimeViewController: UIViewController {
     @IBOutlet weak var navItem: UINavigationItem!
-    @IBOutlet weak var durationPicker: UIPickerView!
+    @IBOutlet weak var durationPicker: UIDatePicker!
     @IBOutlet weak var datePicker: UIDatePicker!
     
     var task: TimedTask? {
@@ -44,12 +44,11 @@ class AddTimeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         // Set title
         self.navItem.title = "Task \(task.name)"
         
+        // Set default duration
+        durationPicker.countDownDuration = 3600
+        
         // Don't allow future time
         datePicker.maximumDate = Date()
-        
-        // Set default duration (1 hours, 0 min)
-        durationPicker.selectRow(1, inComponent: 0, animated: false)
-        durationPicker.selectRow(0, inComponent: 1, animated: false)
     }
     
     // Mark: - Dismissing
@@ -63,7 +62,7 @@ class AddTimeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
             return
         }
         
-        let duration = self.durationPicker.selectedRow(inComponent: 0) * 3600 + self.durationPicker.selectedRow(inComponent: 1) * 60
+        let duration = self.durationPicker.countDownDuration
         
         // Calculate date points
         let first = self.datePicker.date
@@ -88,29 +87,5 @@ class AddTimeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         
         self.delegate?.addTime(first: first, final: final)
         self.dismiss(animated: true, completion: nil)
-    }
-    
-    // Mark: - Duration Picker
-    
-    func numberOfComponents(in pickerView: UIPickerView) -> Int {
-        return 2
-    }
-    
-    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        if component == 0 {
-            return 24
-        }
-        
-        return 60
-    }
-    
-    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return  component == 0 ? "hours" : "min"
-    }
-    
-    func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
-        let label = UILabel()
-        label.text = "\(row)"
-        return label
     }
 }

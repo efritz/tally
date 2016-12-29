@@ -105,13 +105,13 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         
         let controller = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
+        controller.addAction(UIAlertAction(title: "Rename Task", style: .default, handler: { _ in
+            self.renameTask(task: task)
+        }))
+        
         controller.addAction(UIAlertAction(title: "Add Time to Task", style: .default, handler: { _ in
             self.segueTask = task
             self.performSegue(withIdentifier: "addTime", sender: nil)
-        }))
-        
-        controller.addAction(UIAlertAction(title: "Rename Task", style: .default, handler: { _ in
-            self.renameTask(task: task)
         }))
         
         controller.addAction(UIAlertAction(title: "Delete Task", style: .destructive, handler: { _ in
