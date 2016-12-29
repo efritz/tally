@@ -163,7 +163,7 @@ class Database {
         return false
     }
     
-    func update(duration: Duration, withNote note: String) -> Bool {
+    func update(duration: Duration, withNote note: String?) -> Bool {
         let update = self.durations.filter(self.durationId == duration.id).update(self.note <- note)
         
         if let db = self.db {

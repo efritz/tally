@@ -33,13 +33,14 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         // Remove separators betewen empty cells
         self.tableView.tableFooterView = UIView(frame: CGRect.zero)
         
-        if let tasks = Database.instance.allTasks() {
-            for task in tasks {
-                self.tasks.append(task)
-            }
-        } else {
+        guard let tasks = Database.instance.allTasks() else {
             // TODO - better recovery
             print("Could not retrieve tasks.")
+            return
+        }
+        
+        for task in tasks {
+            self.tasks.append(task)
         }
         
         self.updateTotalElapsed()
@@ -66,13 +67,14 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
                     return
                 }
                 
-                if let task = Database.instance.createTask(name: name) {
-                    self.tasks.append(task)
-                    self.tableView.insertRows(at: [IndexPath(row: self.realIndex(index: self.tasks.count - 1), section: 0)], with: .right)
-                } else {
+                guard let task = Database.instance.createTask(name: name) else {
                     // TODO - better recovery
                     print("Could not create task.")
+                    return
                 }
+                
+                self.tasks.append(task)
+                self.tableView.insertRows(at: [IndexPath(row: self.realIndex(index: self.tasks.count - 1), section: 0)], with: .right)
             }
         }))
         
@@ -98,22 +100,20 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             return
         }
         
-        let index = self.taskIndex(index: indexPath.row)
-        let task = self.tasks[index]
-        let cell = self.cellAt(index: index)
+        let task = self.tasks[self.taskIndex(index: indexPath.row)]
         
         let controller = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         controller.addAction(UIAlertAction(title: "Add Time to Task", style: .default, handler: { _ in
-            self.addTime(task: task, cell: cell)
+            self.addTime(task: task)
         }))
         
         controller.addAction(UIAlertAction(title: "Rename Task", style: .default, handler: { _ in
-            self.renameTask(task: task, cell: cell)
+            self.renameTask(task: task)
         }))
         
         controller.addAction(UIAlertAction(title: "Delete Task", style: .destructive, handler: { _ in
-            self.deleteTask(task: task, cell: cell)
+            self.deleteTask(task: task)
         }))
         
         controller.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
@@ -139,7 +139,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         let task = self.tasks[expandedIndex]
         let index = indexPath.row - expandedIndex - 1
         let revIndex = self.tasks[expandedIndex].durations.count - index - 1
-        let cell = self.detailCellAt(index: revIndex)
         
         var title: String
         var message: String? = nil
@@ -157,12 +156,12 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         let controller = UIAlertController(title: nil, message: message, preferredStyle: .actionSheet)
         
         controller.addAction(UIAlertAction(title: title, style: .default, handler: { _ in
-            self.renameDuration(duration: task.durations[revIndex], cell: cell, index: revIndex)
+            self.renameDuration(duration: task.durations[revIndex], index: revIndex)
         }))
         
         if !task.durations[revIndex].active() {
             controller.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
-                self.deleteDuration(duration: task.durations[revIndex], cell: cell, index: revIndex)
+                self.deleteDuration(duration: task.durations[revIndex], index: revIndex)
             }))
         }
         
@@ -191,12 +190,12 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         self.showDetail(index: taskIndex)
     }
     
-    private func addTime(task: TimedTask, cell: TaskCell) {
+    private func addTime(task: TimedTask) {
         self.segueTask = task
         self.performSegue(withIdentifier: "addTime", sender: nil)
     }
     
-    private func renameTask(task: TimedTask, cell: TaskCell) {
+    private func renameTask(task: TimedTask) {
         let controller = UIAlertController(title: "Rename Task \(task.name)", message: "What would you rather call it?", preferredStyle: .alert)
         
         controller.addTextField(configurationHandler: { field in
@@ -209,12 +208,14 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
                     return
                 }
                 
-                task.name = name
-                cell.updateName()
-                
                 if !Database.instance.update(task: task, name: name) {
                     // TODO - better recovery
                     print("Could not update task name.")
+                }
+                
+                if let taskIndex = self.tasks.index(where: { $0.id == task.id }) {
+                    task.name = name
+                    self.cellAt(index: taskIndex).updateName()
                 }
             }
         }))
@@ -224,43 +225,41 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         self.present(controller, animated: true, completion: nil)
     }
     
-    private func deleteTask(task: TimedTask, cell: TaskCell) {
-        if let indexPath = self.tableView.indexPath(for: cell) {
-            let index = self.taskIndex(index: indexPath.row)
+    private func deleteTask(task: TimedTask) {
+        if let taskIndex = self.tasks.index(where: { $0.id == task.id }) {
+            if !Database.instance.delete(task: task) {
+                // TODO - better recovery
+                print("Could not delete task.")
+                return
+            }
             
-            for i in index..<self.tasks.count {
+            for i in taskIndex..<self.tasks.count {
                 self.cellAt(index: i).moveDown()
             }
             
             if let activeIndex = self.activeIndex {
-                if activeIndex > index {
+                if activeIndex > taskIndex {
                     self.activeIndex = activeIndex - 1
                 }
             }
             
-            if !Database.instance.delete(task: task) {
-                // TODO - better recovery
-                print("Could not delete task.")
+            if task.active() {
+                self.activeIndex = nil
             }
             
             if let expandedIndex  = self.expandedIndex {
-                if expandedIndex == index {
+                if expandedIndex == taskIndex {
                     let _ = self.closeDetail()
                 }
             }
             
-            self.tasks.remove(at: index)
-            self.tableView.deleteRows(at: [indexPath], with: .fade)
+            self.tasks.remove(at: taskIndex)
+            self.tableView.deleteRows(at: [IndexPath(row: self.realIndex(index: taskIndex), section: 0)], with: .fade)
             self.updateTotalElapsed()
-        }
-        
-        if task.active() {
-            self.activeIndex = nil
-            cell.stop()
         }
     }
     
-    private func renameDuration(duration: Duration, cell: TaskDetailCell, index: Int) {
+    private func renameDuration(duration: Duration, index: Int) {
         var title: String
         var message: String
         
@@ -280,13 +279,13 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         
         controller.addAction(UIAlertAction(title: "Ok", style: .default, handler: { _ in
             if let field = controller.textFields?.first, let note = field.text {
-                duration.note = note == "" ? nil : note
-                cell.update()
-                
-                if !Database.instance.update(duration: duration, withNote: note) {
+                if !Database.instance.update(duration: duration, withNote: note == "" ? nil : note) {
                     // TODO - better recovery
                     print("Could not update task detail note.")
+                    return
                 }
+                
+                self.detailCellAt(index: index).update()
             }
         }))
         
@@ -295,8 +294,14 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         self.present(controller, animated: true, completion: nil)
     }
     
-    private func deleteDuration(duration: Duration, cell: TaskDetailCell, index: Int) {
-        guard let expandedIndex = self.expandedIndex, let indexPath = self.tableView.indexPath(for: cell) else {
+    private func deleteDuration(duration: Duration, index: Int) {
+        guard let expandedIndex = self.expandedIndex else {
+            return
+        }
+        
+        if !Database.instance.delete(duration: duration) {
+            // TODO - better recovery
+            print("Could not delete duration.")
             return
         }
         
@@ -304,13 +309,10 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             self.detailCellAt(index: i).moveDown()
         }
         
-        if !Database.instance.delete(duration: duration) {
-            // TODO - better recovery
-            print("Could not delete duration.")
-        }
-        
         let task = duration.task
         task.durations.remove(at: index)
+        
+        let indexPath = IndexPath(row: expandedIndex + 1 + index, section: 0)
         
         if task.durations.count == 0 {
             self.tableView.reloadRows(at: [indexPath], with: .fade)
@@ -321,12 +323,10 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         self.cellAt(index: expandedIndex).update()
         self.updateTotalElapsed()
         
-        if let taskIndex = self.tasks.index(where: { $0.id == task.id }) {
-            let newIndex = reorderDown(index: taskIndex)
-            
-            if let activeIndex = self.activeIndex, activeIndex == taskIndex {
-                self.activeIndex = newIndex
-            }
+        let newIndex = reorderDown(index: expandedIndex)
+        
+        if let activeIndex = self.activeIndex, activeIndex == expandedIndex {
+            self.activeIndex = newIndex
         }
     }
     
@@ -348,39 +348,40 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             return
         }
         
-        if let duration = Database.instance.createDuration(for: task, first: first, final: final) {
-            var i = 0
-            while i < task.durations.count && first >= task.durations[i].first {
-                i = i + 1
-            }
+        guard let duration = Database.instance.createDuration(for: task, first: first, final: final) else {
+            // TODO - better recovery
+            print("Could not create task detail.")
+            return
+        }
+        
+        var i = 0
+        while i < task.durations.count && first >= task.durations[i].first {
+            i = i + 1
+        }
+        
+        // Insert duration sorted by
+        task.durations.insert(duration, at: i)
+        
+        if let index = self.tasks.index(where: { $0.id == task.id }) {
+            // Update elapsed counts
+            self.updateCell(index: index)
             
-            // Insert duration sorted by
-            task.durations.insert(duration, at: i)
-            
-            if let index = self.tasks.index(where: { $0.id == task.id }) {
-                // Update elapsed counts
-                self.updateCell(index: index)
-                
-                // If expanded, insert new row
-                if let expandedIndex = self.expandedIndex, expandedIndex == index {
-                    let durationIndex = self.realIndex(index: index) + task.durations.count - i
-                        
-                    if task.durations.count == 1 {
-                        self.tableView.reloadRows(at: [IndexPath(row: durationIndex, section: 0)], with: .fade)
-                    } else {
-                        self.tableView.insertRows(at: [IndexPath(row: durationIndex, section: 0)], with: .fade)
-                        
+            // If expanded, insert new row
+            if let expandedIndex = self.expandedIndex, expandedIndex == index {
+                let durationIndex = self.realIndex(index: index) + task.durations.count - i
+                    
+                if task.durations.count == 1 {
+                    self.tableView.reloadRows(at: [IndexPath(row: durationIndex, section: 0)], with: .fade)
+                } else {
+                    self.tableView.insertRows(at: [IndexPath(row: durationIndex, section: 0)], with: .fade)
+                    
+                    i = i + 1
+                    while i < task.durations.count {
+                        detailCellAt(index: i).moveUp()
                         i = i + 1
-                        while i < task.durations.count {
-                            detailCellAt(index: i).moveUp()
-                            i = i + 1
-                        }
                     }
                 }
             }
-        } else {
-            // TODO - better recovery
-            print("Could not create task detail.")
         }
     }
 
