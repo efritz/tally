@@ -24,6 +24,7 @@
 		E76AD9531E14C86600C75F2F /* Icon-App-60x60@1x.png in Resources */ = {isa = PBXBuildFile; fileRef = E76AD9451E14C86600C75F2F /* Icon-App-60x60@1x.png */; };
 		E76AD9541E14C86600C75F2F /* Icon-App-60x60@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E76AD9461E14C86600C75F2F /* Icon-App-60x60@2x.png */; };
 		E76AD9551E14C86600C75F2F /* Icon-App-60x60@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = E76AD9471E14C86600C75F2F /* Icon-App-60x60@3x.png */; };
+		E76AD9571E14CA4100C75F2F /* AddNoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E76AD9561E14CA4100C75F2F /* AddNoteViewController.swift */; };
 		E7C9CF3C1E08FD12003D9ABC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7C9CF3B1E08FD12003D9ABC /* AppDelegate.swift */; };
 		E7C9CF3E1E08FD12003D9ABC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7C9CF3D1E08FD12003D9ABC /* ViewController.swift */; };
 		E7C9CF411E08FD12003D9ABC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E7C9CF3F1E08FD12003D9ABC /* Main.storyboard */; };
@@ -132,6 +133,7 @@
 		E76AD9451E14C86600C75F2F /* Icon-App-60x60@1x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-App-60x60@1x.png"; path = "Images/Icons/Icon-App-60x60@1x.png"; sourceTree = "<group>"; };
 		E76AD9461E14C86600C75F2F /* Icon-App-60x60@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-App-60x60@2x.png"; path = "Images/Icons/Icon-App-60x60@2x.png"; sourceTree = "<group>"; };
 		E76AD9471E14C86600C75F2F /* Icon-App-60x60@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-App-60x60@3x.png"; path = "Images/Icons/Icon-App-60x60@3x.png"; sourceTree = "<group>"; };
+		E76AD9561E14CA4100C75F2F /* AddNoteViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddNoteViewController.swift; sourceTree = "<group>"; };
 		E7C9CF381E08FD12003D9ABC /* Tally.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tally.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E7C9CF3B1E08FD12003D9ABC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E7C9CF3D1E08FD12003D9ABC /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -167,6 +169,7 @@
 			children = (
 				E7C9CF3D1E08FD12003D9ABC /* ViewController.swift */,
 				E7169FD91E12D89100821912 /* AddTimeViewController.swift */,
+				E76AD9561E14CA4100C75F2F /* AddNoteViewController.swift */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -436,6 +439,7 @@
 				E7E32F1E1E0F4F3B0054AD12 /* Duration.swift in Sources */,
 				E7E32EEA1E0E2B410054AD12 /* Task.swift in Sources */,
 				E7169FDA1E12D89100821912 /* AddTimeViewController.swift in Sources */,
+				E76AD9571E14CA4100C75F2F /* AddNoteViewController.swift in Sources */,
 				E7C9CF3C1E08FD12003D9ABC /* AppDelegate.swift in Sources */,
 				E7E32EF31E0E2BE70054AD12 /* Formatting.swift in Sources */,
 				E7E32EEF1E0E2B9A0054AD12 /* TaskCell.swift in Sources */,

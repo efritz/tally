@@ -17,7 +17,7 @@ protocol TimerStateChangedDelegate {
     func stopped(index: Int)
 }
 
-class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, TimerStateChangedDelegate, NewTaskDelegate, TimeAddedDelegate {
+class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, TimerStateChangedDelegate, NewTaskDelegate, TimeAddedDelegate, NoteAddedDelegate {
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var totalElapsed: UILabel!
     
@@ -26,6 +26,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     private var expandedIndex: Int?
     private var timer: Timer?
     private var segueTask: TimedTask?
+    private var segueDurationIndex: Int?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -105,7 +106,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         let controller = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         controller.addAction(UIAlertAction(title: "Add Time to Task", style: .default, handler: { _ in
-            self.addTime(task: task)
+            self.segueTask = task
+            self.performSegue(withIdentifier: "addTime", sender: nil)
         }))
         
         controller.addAction(UIAlertAction(title: "Rename Task", style: .default, handler: { _ in
@@ -139,11 +141,12 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         let task = self.tasks[expandedIndex]
         let index = indexPath.row - expandedIndex - 1
         let revIndex = self.tasks[expandedIndex].durations.count - index - 1
+        let duration = task.durations[revIndex]
         
         var title: String
         var message: String? = nil
         
-        if task.durations[revIndex].note == nil {
+        if duration.note == nil {
             title = "Add Note"
         } else {
             title = "Update Note"
@@ -156,12 +159,14 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         let controller = UIAlertController(title: nil, message: message, preferredStyle: .actionSheet)
         
         controller.addAction(UIAlertAction(title: title, style: .default, handler: { _ in
-            self.renameDuration(duration: task.durations[revIndex], index: revIndex)
+            self.segueTask = task
+            self.segueDurationIndex = revIndex
+            self.performSegue(withIdentifier: "addNote", sender: nil)
         }))
         
         if !task.durations[revIndex].active() {
             controller.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
-                self.deleteDuration(duration: task.durations[revIndex], index: revIndex)
+                self.deleteDuration(duration: duration, index: revIndex)
             }))
         }
         
@@ -188,11 +193,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         }
         
         self.showDetail(index: taskIndex)
-    }
-    
-    private func addTime(task: TimedTask) {
-        self.segueTask = task
-        self.performSegue(withIdentifier: "addTime", sender: nil)
     }
     
     private func renameTask(task: TimedTask) {
@@ -259,41 +259,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         }
     }
     
-    private func renameDuration(duration: Duration, index: Int) {
-        var title: String
-        var message: String
-        
-        if duration.note == nil {
-            title = "Add Note to Entry #\(index + 1) of Task \(duration.task.name)"
-            message = "What would you like to say?"
-        } else {
-            title = "Update Note to Entry #\(index + 1) of Task \(duration.task.name)"
-            message = "What would you rather say?"
-        }
-        
-        let controller = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        
-        controller.addTextField(configurationHandler: { field in
-            field.text = duration.note ?? ""
-        })
-        
-        controller.addAction(UIAlertAction(title: "Ok", style: .default, handler: { _ in
-            if let field = controller.textFields?.first, let note = field.text {
-                if !Database.instance.update(duration: duration, withNote: note == "" ? nil : note) {
-                    // TODO - better recovery
-                    print("Could not update task detail note.")
-                    return
-                }
-                
-                self.detailCellAt(index: index).update()
-            }
-        }))
-        
-        controller.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        
-        self.present(controller, animated: true, completion: nil)
-    }
-    
     private func deleteDuration(duration: Duration, index: Int) {
         guard let expandedIndex = self.expandedIndex else {
             return
@@ -333,12 +298,29 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     // Mark: - Segues
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        guard let controller = (segue.destination as? UINavigationController)?.topViewController else {
+            return
+        }
+        
         if segue.identifier == "addTime" {
-            if let navController = segue.destination as? UINavigationController {
-                if let task = self.segueTask, let controller = navController.topViewController as? AddTimeViewController {
-                    controller.task = task
-                    controller.delegate = self
-                }
+            guard let controller = controller as? AddTimeViewController else {
+                return
+            }
+            
+            if let task = self.segueTask {
+                controller.task = task
+                controller.delegate = self
+            }
+        }
+        
+        if segue.identifier == "addNote" {
+            guard let controller = controller as? AddNoteViewController else {
+                return
+            }
+            
+            if let task = self.segueTask, let index = self.segueDurationIndex {
+                controller.duration = task.durations[index]
+                controller.delegate = self
             }
         }
     }
@@ -383,6 +365,22 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
                 }
             }
         }
+    }
+    
+    func editNote(note: String) {
+        guard let task = self.segueTask, let index = self.segueDurationIndex else {
+            return
+        }
+        
+        let duration = task.durations[index]
+        
+        if !Database.instance.update(duration: duration, withNote: note == "" ? nil : note) {
+            // TODO - better recovery
+            print("Could not update task detail note.")
+            return
+        }
+
+        self.detailCellAt(index: index).update()
     }
 
     // Mark: - Timer State Change

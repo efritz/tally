@@ -58,7 +58,7 @@ class AddTimeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         self.dismiss(animated: true, completion: nil)
     }
     
-    @IBAction func onAdd(_ sender: UIBarButtonItem) {
+    @IBAction func onSave(_ sender: UIBarButtonItem) {
         guard let task = self.task else {
             return
         }
