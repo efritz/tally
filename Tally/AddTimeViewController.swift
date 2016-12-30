@@ -12,7 +12,7 @@ protocol TimeAddedDelegate {
     func addTime(first: Date, final: Date)
 }
 
-class AddTimeViewController: UIViewController {
+class AddTimeViewController: UITableViewController {
     @IBOutlet weak var navItem: UINavigationItem!
     @IBOutlet weak var durationPicker: UIDatePicker!
     @IBOutlet weak var datePicker: UIDatePicker!
