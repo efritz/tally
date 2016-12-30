@@ -52,7 +52,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
     
     private func updateTotalElapsed() {
-        self.totalElapsed.text = formatElapsed(self.tasks.map({ $0.elapsed() }).reduce(0, +))
+        self.totalElapsed.text = "All Tasks - \(formatElapsed(self.tasks.map({ $0.elapsed() }).reduce(0, +)))"
     }
     
     // Mark: - Task Creation
