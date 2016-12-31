@@ -17,6 +17,9 @@ class AddTimeViewController: UITableViewController {
     @IBOutlet weak var durationPicker: UIDatePicker!
     @IBOutlet weak var datePicker: UIDatePicker!
     
+    private var showingDatePicker = false
+    private var showingDurationPicker = false
+    
     var task: TimedTask? {
         didSet {
             self.configureView()
@@ -27,6 +30,11 @@ class AddTimeViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Remove separators betewen empty cells
+        self.tableView.tableFooterView = UIView(frame: CGRect.zero)
+        
+        // Try to set initial data
         self.configureView()
     }
     
@@ -44,11 +52,16 @@ class AddTimeViewController: UITableViewController {
         // Set title
         self.navItem.title = "Task \(task.name)"
         
-        // Set default duration
-        durationPicker.countDownDuration = 3600
+        // Set default values
+        self.durationPicker.countDownDuration = 60
+        self.datePicker.setDate(Date(), animated: true)
         
-        // Don't allow future time
-        datePicker.maximumDate = Date()
+        // Don't allow future start times
+        self.datePicker.maximumDate = Date()
+        
+        // Set initial label values
+        self.onStartChanged(self.datePicker)
+        self.onDurationChanged(self.durationPicker)
     }
     
     // Mark: - Dismissing
@@ -66,7 +79,7 @@ class AddTimeViewController: UITableViewController {
         
         // Calculate date points
         let first = self.datePicker.date
-        let final = first.addingTimeInterval(TimeInterval(duration))
+        let final = first.addingTimeInterval(duration)
         
         for duration in task.durations {
             if duration.intersects(first: first, final: final) {
@@ -87,5 +100,55 @@ class AddTimeViewController: UITableViewController {
         
         self.delegate?.addTime(first: first, final: final)
         self.dismiss(animated: true, completion: nil)
+    }
+    
+    // Mark: - Picker Observers
+    
+    @IBAction func onDurationChanged(_ sender: UIDatePicker) {
+        if let cell = self.tableView.cellForRow(at: IndexPath(row: 0, section: 0)) {
+            cell.detailTextLabel?.text = formatElapsed(Int(sender.countDownDuration))
+        }
+    }
+    
+    @IBAction func onStartChanged(_ sender: UIDatePicker) {
+        if let cell = self.tableView.cellForRow(at: IndexPath(row: 2, section: 0)) {
+            cell.detailTextLabel?.text = formatTime(sender.date)
+        }
+    }
+    
+    // Mark: - Show/Hide Pickers
+    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if indexPath.row == 1 && !self.showingDurationPicker {
+            return 0
+        }
+        
+        if indexPath.row == 3 && !self.showingDatePicker {
+            return 0
+        }
+        
+        return super.tableView(self.tableView, heightForRowAt: indexPath)
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if indexPath.row == 0 {
+            self.showingDurationPicker = !self.showingDurationPicker
+            
+            if self.showingDurationPicker {
+                self.showingDatePicker = false
+            }
+        }
+        
+        if indexPath.row == 2 {
+            self.showingDatePicker = !self.showingDatePicker
+            
+            if self.showingDatePicker {
+                self.showingDurationPicker = false
+            }
+        }
+        
+        self.tableView.beginUpdates()
+        self.tableView.endUpdates()
+        self.tableView.deselectRow(at: indexPath, animated: true)
     }
 }

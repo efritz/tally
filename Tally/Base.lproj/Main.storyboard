@@ -356,6 +356,9 @@
                                                     <date key="date" timeIntervalSinceReferenceDate="504812828.70146799">
                                                         <!--2016-12-30 17:47:08 +0000-->
                                                     </date>
+                                                    <connections>
+                                                        <action selector="onDurationChanged:" destination="O3e-EG-2jc" eventType="valueChanged" id="Cz5-Ch-5W5"/>
+                                                    </connections>
                                                 </datePicker>
                                             </subviews>
                                             <constraints>
@@ -402,6 +405,9 @@
                                                     <date key="date" timeIntervalSinceReferenceDate="504812831.49350399">
                                                         <!--2016-12-30 17:47:11 +0000-->
                                                     </date>
+                                                    <connections>
+                                                        <action selector="onStartChanged:" destination="O3e-EG-2jc" eventType="valueChanged" id="5pP-FY-1CZ"/>
+                                                    </connections>
                                                 </datePicker>
                                             </subviews>
                                             <constraints>
