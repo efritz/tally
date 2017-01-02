@@ -26,6 +26,7 @@ class AddTimeViewController: UITableViewController {
         }
     }
     
+    var tasks: [TimedTask]?
     var delegate: TimeAddedDelegate?
     
     override func viewDidLoad() {
@@ -71,7 +72,7 @@ class AddTimeViewController: UITableViewController {
     }
     
     @IBAction func onSave(_ sender: UIBarButtonItem) {
-        guard let task = self.task else {
+        guard let tasks = self.tasks else {
             return
         }
         
@@ -86,23 +87,30 @@ class AddTimeViewController: UITableViewController {
             return
         }
         
-        for duration in task.durations {
-            if duration.intersects(first: first, final: final) {
-                let t = formatTime(duration.first)
-                let d = formatElapsed(duration.elapsed())
-                
-                if duration.active() {
-                    self.showError(message: "The duration provided intersects with the active timer started at \(t).")
-                } else {
-                    self.showError(message: "The duration provided intersects with a \(d) timer starting at \(t).")
+        for t in tasks {
+            for duration in t.durations {
+                if duration.intersects(first: first, final: final) {
+                    self.showIntersectionError(duration: duration)
+                    return
                 }
-                
-                return
             }
         }
         
         self.delegate?.addTime(first: first, final: final)
         self.dismiss(animated: true, completion: nil)
+    }
+    
+    private func showIntersectionError(duration: Duration) {
+        if duration.active() {
+            self.showError(message: "The duration provided intersects with the active timer.")
+            return
+        }
+        
+        let t = formatTime(duration.first)
+        let d = formatElapsed(duration.elapsed())
+        let p = duration.task.id != self.task?.id ? " in task \(duration.task.name)" : ""
+        
+        self.showError(message: "The duration provided intersects with the \(d) timer starting at \(t)\(p).")
     }
     
     private func showError(message: String) {

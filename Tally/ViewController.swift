@@ -310,6 +310,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             
             if let task = self.segueTask {
                 controller.task = task
+                controller.tasks = self.tasks
                 controller.delegate = self
             }
         }
