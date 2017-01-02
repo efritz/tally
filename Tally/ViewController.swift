@@ -275,9 +275,10 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         }
         
         let task = duration.task
+        let revIndex = task.durations.count - index - 1
         task.durations.remove(at: index)
         
-        let indexPath = IndexPath(row: expandedIndex + 1 + index, section: 0)
+        let indexPath = IndexPath(row: expandedIndex + 1 + revIndex, section: 0)
         
         if task.durations.count == 0 {
             self.tableView.reloadRows(at: [indexPath], with: .fade)
