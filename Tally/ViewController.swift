@@ -19,7 +19,7 @@ protocol TimerStateChangedDelegate {
 
 class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, TimerStateChangedDelegate, NewTaskDelegate, TimeAddedDelegate, NoteAddedDelegate {
     @IBOutlet weak var tableView: UITableView!
-    @IBOutlet weak var totalElapsed: UILabel!
+    @IBOutlet weak var navItem: UINavigationItem!
     
     private var tasks = [TimedTask]()
     private var activeIndex: Int?
@@ -52,7 +52,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
     
     private func updateTotalElapsed() {
-        self.totalElapsed.text = "All Tasks - \(formatElapsed(self.tasks.map({ $0.elapsed() }).reduce(0, +)))"
+        self.navItem.title = "All Tasks - \(formatElapsed(self.tasks.map({ $0.elapsed() }).reduce(0, +)))"
     }
     
     // Mark: - Task Creation
