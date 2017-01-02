@@ -17,9 +17,49 @@ protocol TimerStateChangedDelegate {
     func stopped(index: Int)
 }
 
+class SummaryView: UIView {
+    var tasks: [TimedTask]?
+    
+    private var i = 0
+    override func draw(_ rect: CGRect) {
+        guard let tasks = self.tasks else {
+            return
+        }
+    
+        let durations = tasks.flatMap({ $0.durations }).sorted(by: { $0.first < $1.first }).map { d in
+            (d.task.color, Double(d.elapsed()))
+        }
+        
+        var first = 0.0
+        let total = durations.map({ $0.1 }).reduce(0, +)
+        
+        for (color, elapsed) in durations {
+            let a = first
+            let b = first + elapsed
+            first = b
+            
+            self.drawDuration(a: a / total, b: b / total, color: color)
+        }
+    }
+    
+    private func drawDuration(a: Double, b: Double, color: UIColor) {
+        let w = Double(self.bounds.width)
+        let h = Double(self.bounds.height)
+        let r = CGRect(x: a * w, y: 0, width: b * w, height: h)
+        
+        if let context = UIGraphicsGetCurrentContext() {
+            context.setFillColor(color.cgColor)
+            context.setStrokeColor(color.cgColor)
+            context.fill(r)
+            context.stroke(r)
+        }
+    }
+}
+
 class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, TimerStateChangedDelegate, NewTaskDelegate, TimeAddedDelegate, NoteAddedDelegate {
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var navItem: UINavigationItem!
+    @IBOutlet weak var summaryView: SummaryView!
     
     private var tasks = [TimedTask]()
     private var activeIndex: Int?
@@ -45,6 +85,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         }
         
         self.updateTotalElapsed()
+        self.updateSummary()
     }
     
     override func didReceiveMemoryWarning() {
@@ -53,6 +94,11 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     
     private func updateTotalElapsed() {
         self.navItem.title = "All Tasks - \(formatElapsed(self.tasks.map({ $0.elapsed() }).reduce(0, +)))"
+    }
+    
+    private func updateSummary() {
+        self.summaryView.tasks = self.tasks
+        self.summaryView.setNeedsDisplay()
     }
     
     // Mark: - Task Creation
@@ -256,6 +302,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             self.tasks.remove(at: taskIndex)
             self.tableView.deleteRows(at: [IndexPath(row: self.realIndex(index: taskIndex), section: 0)], with: .fade)
             self.updateTotalElapsed()
+            self.updateSummary()
         }
     }
     
@@ -288,6 +335,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         
         self.cellAt(index: expandedIndex).update()
         self.updateTotalElapsed()
+        self.updateSummary()
         
         let newIndex = reorderDown(index: expandedIndex)
         
@@ -372,6 +420,9 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             if let activeIndex = self.activeIndex, activeIndex == expandedIndex {
                 self.activeIndex = newIndex
             }
+            
+            self.updateTotalElapsed()
+            self.updateSummary()
         }
     }
     
@@ -436,6 +487,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         
         self.updateCell(index: index)
         self.updateTotalElapsed()
+        self.updateSummary()
         self.activeIndex = self.reorderUp(index: index)
     }
     
