@@ -366,6 +366,12 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
                     }
                 }
             }
+            
+            let newIndex = reorderUp(index: index)
+            
+            if let activeIndex = self.activeIndex, activeIndex == expandedIndex {
+                self.activeIndex = newIndex
+            }
         }
     }
     
