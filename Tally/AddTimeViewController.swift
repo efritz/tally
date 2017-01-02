@@ -81,25 +81,35 @@ class AddTimeViewController: UITableViewController {
         let first = self.datePicker.date
         let final = first.addingTimeInterval(duration)
         
+        if final > Date() {
+            self.showError(message: "The duration provided ends in the future.")
+            return
+        }
+        
         for duration in task.durations {
             if duration.intersects(first: first, final: final) {
-                var message: String
+                let t = formatTime(duration.first)
+                let d = formatElapsed(duration.elapsed())
+                
                 if duration.active() {
-                    message = "The duration provided intersects with the active timer started at \(formatTime(duration.first))."
+                    self.showError(message: "The duration provided intersects with the active timer started at \(t).")
                 } else {
-                    message = "The duration provided intersects with a \(formatElapsed(duration.elapsed())) timer starting at \(formatTime(duration.first))."
+                    self.showError(message: "The duration provided intersects with a \(d) timer starting at \(t).")
                 }
                 
-                let controller = UIAlertController(title: "Cannot add time to task", message: message, preferredStyle: .alert)
-                
-                controller.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
-                self.present(controller, animated: true, completion: nil)
                 return
             }
         }
         
         self.delegate?.addTime(first: first, final: final)
         self.dismiss(animated: true, completion: nil)
+    }
+    
+    private func showError(message: String) {
+        let controller = UIAlertController(title: "Cannot add time to task", message: message, preferredStyle: .alert)
+        
+        controller.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+        self.present(controller, animated: true, completion: nil)
     }
     
     // Mark: - Picker Observers
