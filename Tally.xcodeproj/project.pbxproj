@@ -174,10 +174,16 @@
 				E7C9CF3D1E08FD12003D9ABC /* ViewController.swift */,
 				E7169FD91E12D89100821912 /* AddTimeViewController.swift */,
 				E76AD9561E14CA4100C75F2F /* AddNoteViewController.swift */,
-				E750F95A1E1B5A95000AC4B3 /* Delegates.swift */,
-				E750F9621E1B5AC9000AC4B3 /* SummaryView.swift */,
 			);
 			name = Controllers;
+			sourceTree = "<group>";
+		};
+		E750F9641E1B5AE2000AC4B3 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				E750F9621E1B5AC9000AC4B3 /* SummaryView.swift */,
+			);
+			name = Views;
 			sourceTree = "<group>";
 		};
 		E76AD9331E14C85700C75F2F /* Icons */ = {
@@ -221,11 +227,13 @@
 		E7C9CF3A1E08FD12003D9ABC /* Tally */ = {
 			isa = PBXGroup;
 			children = (
+				E7E32F1C1E0F4F2A0054AD12 /* Model */,
 				E7169FE11E12D8A400821912 /* Controllers */,
-				E7E32F1C1E0F4F2A0054AD12 /* Data Model */,
 				E7E32EED1E0E2B8C0054AD12 /* Cells */,
+				E750F9641E1B5AE2000AC4B3 /* Views */,
 				E7E32EF61E0E2C240054AD12 /* Util */,
 				E7DE9E521E0A3FF9009BA639 /* Images */,
+				E750F95A1E1B5A95000AC4B3 /* Delegates.swift */,
 				E7C9CF3B1E08FD12003D9ABC /* AppDelegate.swift */,
 				E7C9CF3F1E08FD12003D9ABC /* Main.storyboard */,
 				E7C9CF441E08FD12003D9ABC /* LaunchScreen.storyboard */,
@@ -278,14 +286,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		E7E32F1C1E0F4F2A0054AD12 /* Data Model */ = {
+		E7E32F1C1E0F4F2A0054AD12 /* Model */ = {
 			isa = PBXGroup;
 			children = (
 				E7E32EE91E0E2B410054AD12 /* Task.swift */,
 				E7E32F1D1E0F4F3A0054AD12 /* Duration.swift */,
 				E7E32F1A1E0E39570054AD12 /* Persistence.swift */,
 			);
-			name = "Data Model";
+			name = Model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
