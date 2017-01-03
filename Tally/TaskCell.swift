@@ -96,7 +96,6 @@ class TaskCell: UITableViewCell {
             return
         }
         
-        task.start()
         self.startAnimation()
     }
     
@@ -105,7 +104,6 @@ class TaskCell: UITableViewCell {
             return
         }
         
-        task.stop()
         self.stopAnimation()
     }
     

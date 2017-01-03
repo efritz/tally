@@ -445,6 +445,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     // Mark: - Timer State Change
 
     func started(index: Int) {
+        self.tasks[index].start()
+        
         if let expandedIndex = self.expandedIndex {
             if expandedIndex == index {
                 if self.tasks[index].durations.count == 1 {
@@ -456,6 +458,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         }
         
         if let index = self.activeIndex {
+            self.tasks[index].stop()
             self.cellAt(index: index).stop()
             self.updateCell(index: index)
         }
@@ -470,6 +473,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
 
     func stopped(index: Int) {
+        self.tasks[index].stop()
         self.update()
         
         if let timer = self.timer {
