@@ -92,18 +92,10 @@ class TaskCell: UITableViewCell {
     }
     
     func start() {
-        guard let task = self.task else {
-            return
-        }
-        
         self.startAnimation()
     }
     
     func stop() {
-        guard let task = self.task else {
-            return
-        }
-        
         self.stopAnimation()
     }
     
