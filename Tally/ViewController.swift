@@ -8,15 +8,6 @@
 
 import UIKit
 
-protocol NewTaskDelegate {
-    func makeNewTask()
-}
-
-protocol TimerStateChangedDelegate {
-    func started(index: Int)
-    func stopped(index: Int)
-}
-
 class SummaryView: UIView {
     var tasks: [TimedTask]?
     

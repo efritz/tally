@@ -8,10 +8,6 @@
 
 import UIKit
 
-protocol TimeAddedDelegate {
-    func addTime(first: Date, final: Date)
-}
-
 class AddTimeViewController: UITableViewController {
     @IBOutlet weak var navItem: UINavigationItem!
     @IBOutlet weak var durationPicker: UIDatePicker!

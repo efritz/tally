@@ -8,10 +8,6 @@
 
 import UIKit
 
-protocol NoteAddedDelegate {
-    func editNote(note: String)
-}
-
 class AddNoteViewController: UIViewController {
     @IBOutlet weak var navItem: UINavigationItem!
     @IBOutlet weak var textView: UITextView!
