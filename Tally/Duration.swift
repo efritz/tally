@@ -40,7 +40,7 @@ class Duration {
         }
         
         if !Database.instance.update(duration: self) {
-            // TODO - better recovery
+            // better recovery
             print("Could not update duration.")
         }
     }

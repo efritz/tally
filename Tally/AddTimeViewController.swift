@@ -22,7 +22,7 @@ class AddTimeViewController: UITableViewController {
         }
     }
     
-    var tasks: [TimedTask]?
+    var durations: [Duration]?
     var delegate: TimeAddedDelegate?
     
     override func viewDidLoad() {
@@ -68,7 +68,7 @@ class AddTimeViewController: UITableViewController {
     }
     
     @IBAction func onSave(_ sender: UIBarButtonItem) {
-        guard let tasks = self.tasks else {
+        guard let durations = self.durations else {
             return
         }
         
@@ -83,12 +83,10 @@ class AddTimeViewController: UITableViewController {
             return
         }
         
-        for t in tasks {
-            for duration in t.durations {
-                if duration.intersects(first: first, final: final) {
-                    self.showIntersectionError(duration: duration)
-                    return
-                }
+        for duration in durations {
+            if duration.intersects(first: first, final: final) {
+                self.showIntersectionError(duration: duration)
+                return
             }
         }
         

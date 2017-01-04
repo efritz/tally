@@ -8,6 +8,21 @@
 
 import UIKit
 
+// TODO - rename for matching verb tense
+
+protocol TaskCollectionDelegate {
+    func stopTask(index: Int)
+    func updateTask(index: Int)
+    func updateDetail(index: Int)
+    func moveTaskCell(from: Int, to: Int)
+    
+    func addTaskCell(index: Int)
+    func removeTaskCell(index: Int)
+    
+    func addDetailCells(indices: [Int])
+    func removeDetailCells(indices: [Int])
+}
+
 protocol NewTaskDelegate {
     func makeNewTask()
 }

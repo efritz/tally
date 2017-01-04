@@ -27,7 +27,7 @@ class TimedTask {
         if let duration = Database.instance.createDuration(for: self) {
             self.durations.append(duration)
         } else {
-            // TODO - better recovery
+            // better recovery
             print("Could not create duration.")
         }
     }

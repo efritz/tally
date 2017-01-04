@@ -9,16 +9,12 @@
 import UIKit
 
 class SummaryView: UIView {
-    var tasks: [TimedTask]?
+    var durations: [Duration]?
     
     private var i = 0
     override func draw(_ rect: CGRect) {
-        guard let tasks = self.tasks else {
+        guard let durations = self.durations?.sorted(by: { $0.first < $1.first }).map({ d in (d.task.color, Double(d.elapsed())) }) else {
             return
-        }
-        
-        let durations = tasks.flatMap({ $0.durations }).sorted(by: { $0.first < $1.first }).map { d in
-            (d.task.color, Double(d.elapsed()))
         }
         
         var first = 0.0

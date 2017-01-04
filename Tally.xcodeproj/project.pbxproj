@@ -12,6 +12,7 @@
 		E72678091E0C79A80078CE5A /* New.png in Resources */ = {isa = PBXBuildFile; fileRef = E72678081E0C79A80078CE5A /* New.png */; };
 		E750F95B1E1B5A95000AC4B3 /* Delegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = E750F95A1E1B5A95000AC4B3 /* Delegates.swift */; };
 		E750F9631E1B5AC9000AC4B3 /* SummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E750F9621E1B5AC9000AC4B3 /* SummaryView.swift */; };
+		E750F9661E1B6002000AC4B3 /* Collection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E750F9651E1B6002000AC4B3 /* Collection.swift */; };
 		E76AD9481E14C86600C75F2F /* Icon-App-20x20@1x.png in Resources */ = {isa = PBXBuildFile; fileRef = E76AD93A1E14C86600C75F2F /* Icon-App-20x20@1x.png */; };
 		E76AD9491E14C86600C75F2F /* Icon-App-20x20@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E76AD93B1E14C86600C75F2F /* Icon-App-20x20@2x.png */; };
 		E76AD94A1E14C86600C75F2F /* Icon-App-20x20@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = E76AD93C1E14C86600C75F2F /* Icon-App-20x20@3x.png */; };
@@ -123,6 +124,7 @@
 		E72678081E0C79A80078CE5A /* New.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = New.png; path = Images/New.png; sourceTree = "<group>"; };
 		E750F95A1E1B5A95000AC4B3 /* Delegates.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Delegates.swift; sourceTree = "<group>"; };
 		E750F9621E1B5AC9000AC4B3 /* SummaryView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SummaryView.swift; sourceTree = "<group>"; };
+		E750F9651E1B6002000AC4B3 /* Collection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Collection.swift; sourceTree = "<group>"; };
 		E76AD93A1E14C86600C75F2F /* Icon-App-20x20@1x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-App-20x20@1x.png"; path = "Images/Icons/Icon-App-20x20@1x.png"; sourceTree = "<group>"; };
 		E76AD93B1E14C86600C75F2F /* Icon-App-20x20@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-App-20x20@2x.png"; path = "Images/Icons/Icon-App-20x20@2x.png"; sourceTree = "<group>"; };
 		E76AD93C1E14C86600C75F2F /* Icon-App-20x20@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-App-20x20@3x.png"; path = "Images/Icons/Icon-App-20x20@3x.png"; sourceTree = "<group>"; };
@@ -291,6 +293,7 @@
 			children = (
 				E7E32EE91E0E2B410054AD12 /* Task.swift */,
 				E7E32F1D1E0F4F3A0054AD12 /* Duration.swift */,
+				E750F9651E1B6002000AC4B3 /* Collection.swift */,
 				E7E32F1A1E0E39570054AD12 /* Persistence.swift */,
 			);
 			name = Model;
@@ -451,6 +454,7 @@
 				E7E32EF51E0E2C0F0054AD12 /* Colors.swift in Sources */,
 				E7E32EF11E0E2BA50054AD12 /* TaskDetailCell.swift in Sources */,
 				E7E32EEC1E0E2B890054AD12 /* NewTaskCell.swift in Sources */,
+				E750F9661E1B6002000AC4B3 /* Collection.swift in Sources */,
 				E7E32F1E1E0F4F3B0054AD12 /* Duration.swift in Sources */,
 				E7E32EEA1E0E2B410054AD12 /* Task.swift in Sources */,
 				E7169FDA1E12D89100821912 /* AddTimeViewController.swift in Sources */,
