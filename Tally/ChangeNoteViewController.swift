@@ -8,7 +8,7 @@
 
 import UIKit
 
-class AddNoteViewController: UIViewController {
+class ChangeNoteViewController: UIViewController {
     @IBOutlet weak var navItem: UINavigationItem!
     @IBOutlet weak var textView: UITextView!
     
@@ -18,7 +18,7 @@ class AddNoteViewController: UIViewController {
         }
     }
     
-    var delegate: NoteAddedDelegate?
+    var delegate: NoteChangedDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,7 +50,7 @@ class AddNoteViewController: UIViewController {
     }
     
     @IBAction func onDone(_ sender: UIBarButtonItem) {
-        self.delegate?.editNote(note: self.textView.text)
+        self.delegate?.shouldChangeNote(to: self.textView.text)
         self.dismiss(animated: true, completion: nil)
     }
 }

@@ -8,7 +8,7 @@
 
 import UIKit
 
-class TaskCollection {
+class TaskCollection: TimerStateChangedDelegate {
     private var tasks: [TimedTask]
     private var activeIndex: Int?
     private var expandedIndex: Int?
@@ -31,6 +31,7 @@ class TaskCollection {
         self.tasks = tasks
     }
     
+    //
     // Mark: - Getters
     
     func task(at index: Int) -> TimedTask {
@@ -65,7 +66,8 @@ class TaskCollection {
         return self.tasks.flatMap({ $0.durations }).sorted(by: { a, b in a.first < b.first })
     }
     
-    // Mark: - Creation and Deletion
+    //
+    // Mark: - Task Creation and Deletion
     
     func createTask(named name: String) {
         guard let task = Database.instance.createTask(name: name) else {
@@ -75,12 +77,22 @@ class TaskCollection {
         }
 
         self.tasks.append(task)
-        self.delegate?.addTaskCell(index: self.tableIndex(taskIndex: self.tasks.count - 1))
+        self.delegate?.insertTaskCell(at: self.tableIndex(taskIndex: self.tasks.count - 1))
     }
     
     func delete(task: TimedTask) {
         guard let taskIndex = self.index(of: task) else {
             return
+        }
+        
+        if !Database.instance.delete(task: task) {
+            // better recovery
+            print("Task could not be deleted.")
+            return
+        }
+        
+        if task.active() {
+            self.activeIndex = nil
         }
         
         if let activeIndex = self.activeIndex {
@@ -89,41 +101,106 @@ class TaskCollection {
             }
         }
         
-        if task.active() {
-            self.activeIndex = nil
-        }
-        
         if let expandedIndex = self.expandedIndex, expandedIndex == taskIndex {
             let _ = self.collapse()
         }
         
         self.tasks.remove(at: taskIndex)
-        self.delegate?.removeTaskCell(index: self.tableIndex(taskIndex: taskIndex))
+        self.delegate?.deleteTaskCell(at: self.tableIndex(taskIndex: taskIndex))
     }
     
-    func delete(duration: Duration) {
-        // TODO
-    }
+    //
+    // Mark: - Duration Creation and Deletion
     
-    // Mark: - Start/Stop and Update
-    
-    func start(index: Int) {
-        self.stop()
-        self.tasks[index].start()
+    func createDuration(for task: TimedTask, from first: Date, to final: Date) {
+        guard let duration = Database.instance.createDuration(for: task, first: first, final: final) else {
+            // better recovery
+            print("Could not create task detail.")
+            return
+        }
         
-        if let delegate = self.delegate {
-            if let expandedIndex = self.expandedIndex {
-                if expandedIndex == index {
-                    if self.tasks[index].durations.count == 1 {
-                        delegate.updateDetail(index: index + 1)
-                    } else {
-                        delegate.addDetailCells(indices: [index + 1])
-                    }
+        var index = 0
+        while index < task.durations.count && first >= task.durations[index].first {
+            index = index + 1
+        }
+        
+        guard let taskIndex = self.index(of: task) else {
+            return
+        }
+        
+        for i in index..<task.durations.count {
+            self.delegate?.moveDetailCell(index: taskIndex + task.durations.count - i, up: true)
+        }
+        
+        task.durations.insert(duration, at: index)
+        
+        if let expandedIndex = self.expandedIndex {
+            if expandedIndex == taskIndex {
+                let tableIndex = taskIndex + task.durations.count - index
+                
+                if task.durations.count == 1 {
+                    self.delegate?.reloadDetailCells(at: [tableIndex])
+                } else {
+                    self.delegate?.insertDetailCells(at: [tableIndex])
                 }
             }
         }
         
-        self.activeIndex = index
+        self.delegate?.updateTaskCell(at: self.tableIndex(taskIndex: taskIndex))
+        self.reorder(index: taskIndex)
+    }
+    
+    func delete(duration: Duration, index: Int) {
+        guard let (taskIndex, task) = self.expanded() else {
+            return
+        }
+        
+        if !Database.instance.delete(duration: duration) {
+            // better recovery
+            print("Could not delete duration.")
+            return
+        }
+        
+        let tableIndex = taskIndex + task.durations.count - index
+        
+        for i in index..<task.durations.count {
+            self.delegate?.moveDetailCell(index: taskIndex + task.durations.count - i, up: false)
+        }
+        
+        task.durations.remove(at: index)
+        
+        if task.durations.count == 0 {
+            self.delegate?.reloadDetailCells(at: [tableIndex])
+        } else {
+            self.delegate?.deleteDetailCells(at: [tableIndex])
+        }
+        
+        self.delegate?.updateTaskCell(at: self.tableIndex(taskIndex: taskIndex))
+        self.reorder(index: taskIndex)
+    }
+    
+    //
+    // Mark: - Start/Stop and Update
+    
+    func start(index: Int, running: Bool = false) {
+        if self.activeIndex != index {
+            if !running {
+                self.stop()
+                self.tasks[index].start()
+            
+                if let expandedIndex = self.expandedIndex {
+                    if expandedIndex == index {
+                        if self.tasks[index].durations.count == 1 {
+                            self.delegate?.reloadDetailCells(at: [index + 1])
+                        } else {
+                            self.delegate?.insertDetailCells(at: [index + 1])
+                        }
+                    }
+                }
+            }
+            
+            self.activeIndex = index
+        }
         
         if self.timer == nil {
             self.timer = Timer.scheduledTimer(withTimeInterval: 0.33, repeats: true) { _ in
@@ -137,7 +214,7 @@ class TaskCollection {
             return
         }
         
-        self.delegate?.stopTask(index: activeIndex)
+        self.delegate?.stopTaskCell(at: self.tableIndex(taskIndex: activeIndex))
         
         self.tasks[activeIndex].stop()
         self.update()
@@ -151,19 +228,18 @@ class TaskCollection {
             return
         }
         
-        if let delegate = self.delegate {
-            delegate.updateTask(index: self.tableIndex(taskIndex: activeIndex))
-            
-            if let expandedIndex = self.expandedIndex {
-                if expandedIndex == activeIndex {
-                    delegate.updateDetail(index: self.tableIndex(taskIndex: activeIndex) + 1)
-                }
+        delegate?.updateTaskCell(at: self.tableIndex(taskIndex: activeIndex))
+        
+        if let expandedIndex = self.expandedIndex {
+            if expandedIndex == activeIndex {
+                delegate?.updateDetailCells(at: [self.tableIndex(taskIndex: activeIndex) + 1])
             }
         }
         
         self.activeIndex = self.reorderUp(index: activeIndex)
     }
     
+    //
     // Mark: - Expansion
     
     func toggleExpansion(index: Int) {
@@ -178,7 +254,7 @@ class TaskCollection {
     
     private func expand(index: Int) {
         self.expandedIndex = index
-        delegate?.addDetailCells(indices: self.detailIndices())
+        delegate?.insertDetailCells(at: self.detailIndices())
     }
     
     private func collapse() -> Int? {
@@ -188,10 +264,11 @@ class TaskCollection {
         
         let indices = self.detailIndices()
         self.expandedIndex = nil
-        delegate?.removeDetailCells(indices: indices)
+        delegate?.deleteDetailCells(at: indices)
         return expandedIndex
     }
     
+    //
     // Mark: - Ordering
     
     func reorder(index: Int) {
@@ -242,15 +319,11 @@ class TaskCollection {
             self.swapTasks(i, i + 1)
         }
         
-        if let delegate = self.delegate {
-            delegate.moveTaskCell(from: index, to: newIndex)
-        }
+        delegate?.moveTaskCell(from: self.tableIndex(taskIndex: index), to: self.tableIndex(taskIndex: newIndex))
         
         if let shouldExpand = shouldExpand {
             self.expand(index: shouldExpand)
         }
-        
-        // TODO - need to fix active index
         
         return newIndex
     }
@@ -289,9 +362,7 @@ class TaskCollection {
             self.swapTasks(i, i - 1)
         }
         
-        if let delegate = self.delegate {
-            delegate.moveTaskCell(from: index, to: newIndex)
-        }
+        delegate?.moveTaskCell(from: self.tableIndex(taskIndex: index), to: self.tableIndex(taskIndex: newIndex))
         
         if let shouldExpand = shouldExpand {
             self.expand(index: shouldExpand)
@@ -306,6 +377,7 @@ class TaskCollection {
         self.tasks[i] = t
     }
     
+    //
     // Mark: - Index Calculators
     
     func numberOfCells() -> Int {
@@ -346,5 +418,16 @@ class TaskCollection {
         }
         
         return taskIndex
+    }
+    
+    //
+    // Mark: - Timer State Changed Delegates
+    
+    func timer(started index: Int, running: Bool) {
+        self.start(index: index, running: running)
+    }
+    
+    func timer(stopped index: Int) {
+        self.stop()
     }
 }

@@ -8,34 +8,34 @@
 
 import UIKit
 
-// TODO - rename for matching verb tense
-
 protocol TaskCollectionDelegate {
-    func stopTask(index: Int)
-    func updateTask(index: Int)
-    func updateDetail(index: Int)
+    func stopTaskCell(at: Int)
     func moveTaskCell(from: Int, to: Int)
+    func moveDetailCell(index: Int, up: Bool)
     
-    func addTaskCell(index: Int)
-    func removeTaskCell(index: Int)
+    func insertTaskCell(at: Int)
+    func deleteTaskCell(at: Int)
+    func updateTaskCell(at: Int)
     
-    func addDetailCells(indices: [Int])
-    func removeDetailCells(indices: [Int])
-}
-
-protocol NewTaskDelegate {
-    func makeNewTask()
+    func insertDetailCells(at: [Int])
+    func deleteDetailCells(at: [Int])
+    func reloadDetailCells(at: [Int])
+    func updateDetailCells(at: [Int])
 }
 
 protocol TimerStateChangedDelegate {
-    func started(index: Int)
-    func stopped(index: Int)
+    func timer(started index: Int, running: Bool)
+    func timer(stopped index: Int)
+}
+
+protocol NewTaskDelegate {
+    func shouldMakeNewTask()
 }
 
 protocol TimeAddedDelegate {
-    func addTime(first: Date, final: Date)
+    func shouldAddTime(from: Date, to: Date)
 }
 
-protocol NoteAddedDelegate {
-    func editNote(note: String)
+protocol NoteChangedDelegate {
+    func shouldChangeNote(to: String)
 }

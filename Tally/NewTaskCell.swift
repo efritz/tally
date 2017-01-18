@@ -32,7 +32,7 @@ class NewTaskCell: UITableViewCell {
         })
         
         if let delegate = self.delegate {
-            delegate.makeNewTask()
+            delegate.shouldMakeNewTask()
         }
     }
 }

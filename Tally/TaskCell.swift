@@ -53,12 +53,22 @@ class TaskCell: UITableViewCell {
         // See if we were active when app started
         if task.active() {
             self.startAnimation()
-            delegate.started(index: index)
+            delegate.timer(started: index, running: true)
         }
         
         // Set content immediately
         self.update()
         self.updateName()
+    }
+    
+    func teardown() {
+        guard let task = self.task else {
+            return
+        }
+        
+        if task.active() {
+            self.stopAnimation()
+        }
     }
     
     func update() {
@@ -178,10 +188,10 @@ class TaskCell: UITableViewCell {
         
         if !task.active() {
             start()
-            delegate.started(index: index)
+            delegate.timer(started: index, running: false)
         } else {
             stop()
-            delegate.stopped(index: index)
+            delegate.timer(stopped: index)
         }
         
         self.update()

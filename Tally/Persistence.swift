@@ -9,6 +9,8 @@
 import UIKit
 import SQLite
 
+class PersistenceError: Error {}
+
 class Database {
     static let instance = Database()
     
@@ -30,7 +32,8 @@ class Database {
             db = try Connection("\(path)/tally.sqlite3")
         } catch let ex {
             db = nil
-            print("Unable to open database (\(ex))")
+            // better recovery
+            print("Unable to open database (\(ex)).")
         }
         
         do {
@@ -47,7 +50,8 @@ class Database {
                 table.column(self.note)
             }))
         } catch let ex {
-            print("Unable to create table (\(ex))")
+            // better recovery
+            print("Unable to create table (\(ex)).")
         }
     }
     

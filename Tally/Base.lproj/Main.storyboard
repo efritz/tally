@@ -268,6 +268,7 @@
                                 </prototypes>
                                 <connections>
                                     <outlet property="dataSource" destination="BYZ-38-t0r" id="vsT-AZ-Q7K"/>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="4FG-Lc-2yn"/>
                                 </connections>
                             </tableView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7qr-3d-kEv" customClass="SummaryView" customModule="Tally" customModuleProvider="target">
@@ -295,8 +296,8 @@
                         <outlet property="navItem" destination="Kqp-3A-bgj" id="EbF-Mm-zXW"/>
                         <outlet property="summaryView" destination="7qr-3d-kEv" id="zcn-lj-dpv"/>
                         <outlet property="tableView" destination="ohW-Rs-YDy" id="zRp-on-REo"/>
-                        <segue destination="w4F-U4-eOl" kind="show" identifier="addNote" id="m70-83-NZo"/>
-                        <segue destination="tZR-ny-ZaM" kind="show" identifier="addTime" id="Uqz-yM-rrn"/>
+                        <segue destination="w4F-U4-eOl" kind="show" identifier="ChangeNote" id="m70-83-NZo"/>
+                        <segue destination="tZR-ny-ZaM" kind="show" identifier="AddTime" id="Uqz-yM-rrn"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -446,7 +447,7 @@
         <!--Add Note-->
         <scene sceneID="7eb-sU-5zE">
             <objects>
-                <viewController id="Gm1-Dz-YSS" customClass="AddNoteViewController" customModule="Tally" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="Gm1-Dz-YSS" customClass="ChangeNoteViewController" customModule="Tally" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="I0q-nG-Gwh"/>
                         <viewControllerLayoutGuide type="bottom" id="RQZ-WT-7yK"/>

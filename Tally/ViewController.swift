@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController, UITableViewDataSource, TaskCollectionDelegate, TimerStateChangedDelegate, NewTaskDelegate, TimeAddedDelegate, NoteAddedDelegate {
+class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, TaskCollectionDelegate, NewTaskDelegate, TimeAddedDelegate, NoteChangedDelegate {
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var navItem: UINavigationItem!
     @IBOutlet weak var summaryView: SummaryView!
@@ -42,6 +42,9 @@ class ViewController: UIViewController, UITableViewDataSource, TaskCollectionDel
         self.summaryView.setNeedsDisplay()
     }
     
+    //
+    // Mark: - Action Sheet Callbacks
+    
     private func renameTask(task: TimedTask) {
         let controller = UIAlertController(title: "Rename Task \(task.name)", message: "What would you rather call it?", preferredStyle: .alert)
         
@@ -74,55 +77,11 @@ class ViewController: UIViewController, UITableViewDataSource, TaskCollectionDel
         self.present(controller, animated: true, completion: nil)
     }
     
-    private func deleteDuration(duration: Duration, index: Int) {
-        guard let (taskIndex, task) = self.taskCollection.expanded() else {
-            return
-        }
-        
-        // TODO - move most of this logic into task collection
-        
-        if !Database.instance.delete(duration: duration) {
-            print("Could not delete duration.")
-            return
-        }
-        
-        for i in index..<task.durations.count {
-            self.detailCellAt(index: taskIndex + task.durations.count - i)?.moveDown()
-        }
-        
-        let indexPath = IndexPath(row: taskIndex + task.durations.count - index, section: 0)
-        
-        task.durations.remove(at: index)
-        
-        if task.durations.count == 0 {
-            self.tableView.reloadRows(at: [indexPath], with: .fade)
-        } else {
-            self.tableView.deleteRows(at: [indexPath], with: .fade)
-        }
-        
-        guard let index = self.taskCollection.index(of: task) else {
-            return
-        }
-        
-        self.updateGlobal()
-        self.taskCollection.reorder(index: index)
-        self.cellAt(index: self.taskCollection.taskIndex(tableIndex: taskIndex))?.update()
-    }
-
     //
     // Mark: - Data Delegates
     
-    func stopTask(index: Int) {
-        self.cellAt(index: self.taskCollection.taskIndex(tableIndex: index))?.stop()
-    }
-    
-    func updateTask(index: Int) {
-        self.updateGlobal()
-        self.cellAt(index: index)?.update()
-    }
-    
-    func updateDetail(index: Int) {
-        self.detailCellAt(index: index)?.update()
+    func stopTaskCell(at tableIndex: Int) {
+        self.cellAt(index: tableIndex)?.stop()
     }
     
     func moveTaskCell(from: Int, to: Int) {
@@ -141,44 +100,54 @@ class ViewController: UIViewController, UITableViewDataSource, TaskCollectionDel
         self.tableView.moveRow(at: IndexPath(row: from, section: 0), to: IndexPath(row: to, section: 0))
     }
     
-    func addTaskCell(index: Int) {
-        self.tableView.insertRows(at: [IndexPath(row: index, section: 0)], with: .fade)
+    func moveDetailCell(index: Int, up: Bool) {
+        if let cell = self.detailCellAt(index: index) {
+            up ? cell.moveUp() : cell.moveDown()
+        }
     }
     
-    func removeTaskCell(index: Int) {
-        for i in index..<self.tableView.numberOfRows(inSection: 0) {
+    func insertTaskCell(at tableIndex: Int) {
+        self.tableView.insertRows(at: [IndexPath(row: tableIndex, section: 0)], with: .fade)
+    }
+    
+    func deleteTaskCell(at tableIndex: Int) {
+        for i in tableIndex..<self.tableView.numberOfRows(inSection: 0) {
             self.cellAt(index: i)?.moveDown()
         }
         
-        self.tableView.deleteRows(at: [IndexPath(row: index, section: 0)], with: .fade)
+        self.tableView.deleteRows(at: [IndexPath(row: tableIndex, section: 0)], with: .fade)
         self.updateGlobal()
     }
     
-    func addDetailCells(indices: [Int]) {
-        self.tableView.insertRows(at: indices.map({ IndexPath(row: $0, section: 0) }), with: .fade)
+    func updateTaskCell(at tableIndex: Int) {
+        self.cellAt(index: tableIndex)?.update()
+        self.updateGlobal()
     }
     
-    func removeDetailCells(indices: [Int]) {
-        self.tableView.deleteRows(at: indices.map({ IndexPath(row: $0, section: 0) }), with: .fade)
+    func insertDetailCells(at tableIndices: [Int]) {
+        self.tableView.insertRows(at: tableIndices.map({ IndexPath(row: $0, section: 0) }), with: .fade)
     }
     
-    //
-    // Mark: - Cell Delegates
-    
-    // TODO - instead, just make the task collection the delegate
-
-    func started(index: Int) {
-        self.taskCollection.start(index: index)
+    func deleteDetailCells(at tableIndices: [Int]) {
+        self.tableView.deleteRows(at: tableIndices.map({ IndexPath(row: $0, section: 0) }), with: .fade)
     }
     
-    func stopped(index: Int) {
-        self.taskCollection.stop()
+    func reloadDetailCells(at tableIndices: [Int]) {
+        for index in tableIndices {
+            self.tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .fade)
+        }
+    }
+    
+    func updateDetailCells(at tableIndices: [Int]) {
+        for index in tableIndices {
+            self.detailCellAt(index: index)?.update()
+        }
     }
     
     //
     // Mark: - Controller Delegates
     
-    func makeNewTask() {
+    func shouldMakeNewTask() {
         let controller = UIAlertController(title: "Create Task", message: "What would you like to call it?", preferredStyle: .alert)
         
         controller.addTextField(configurationHandler: nil)
@@ -198,60 +167,15 @@ class ViewController: UIViewController, UITableViewDataSource, TaskCollectionDel
         self.present(controller, animated: true, completion: nil)
     }
     
-    func addTime(first: Date, final: Date) {
+    func shouldAddTime(from first: Date, to final: Date) {
         guard let task = self.segueTask else {
             return
         }
         
-        guard let duration = Database.instance.createDuration(for: task, first: first, final: final) else {
-            // better recovery
-            print("Could not create task detail.")
-            return
-        }
-        
-        //
-        // TODO - move some of this logic into task view as well
-        //
-        
-        var i = 0
-        while i < task.durations.count && first >= task.durations[i].first {
-            i = i + 1
-        }
-        
-        // Insert sorted
-        task.durations.insert(duration, at: i)
-        
-        guard let index = self.taskCollection.index(of: task) else {
-            return
-        }
-        
-        // Update elapsed count
-        self.cellAt(index: self.taskCollection.taskIndex(tableIndex: index))?.update()
-        
-        // If expanded, insert new row
-        if let (expandedIndex, task) = self.taskCollection.expanded() {
-            if expandedIndex == index {
-                let indexPath = IndexPath(row: index + task.durations.count - i, section: 0)
-                
-                if task.durations.count == 1 {
-                    self.tableView.reloadRows(at: [indexPath], with: .fade)
-                } else {
-                    self.tableView.insertRows(at: [indexPath], with: .fade)
-                    
-                    i = i + 1
-                    while i < task.durations.count {
-                        self.detailCellAt(index: expandedIndex + i)?.moveUp()
-                        i = i + 1
-                    }
-                }
-            }
-        }
-        
-        self.updateGlobal()
-        self.taskCollection.reorder(index: index)
+        self.taskCollection.createDuration(for: task, from: first, to: final)
     }
     
-    func editNote(note: String) {
+    func shouldChangeNote(to note: String) {
         guard let task = self.segueTask, let index = self.segueDurationIndex, let taskIndex = self.taskCollection.index(of: task) else {
             return
         }
@@ -295,24 +219,16 @@ class ViewController: UIViewController, UITableViewDataSource, TaskCollectionDel
         
         let task = self.taskCollection.task(at: self.taskCollection.taskIndex(tableIndex: indexPath.row))
         
-        let controller = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        controller.addAction(UIAlertAction(title: "Rename Task", style: .default, handler: { _ in
-            self.renameTask(task: task)
-        }))
-        
-        controller.addAction(UIAlertAction(title: "Add Time", style: .default, handler: { _ in
+        let queueSegue = {
             self.segueTask = task
-            self.performSegue(withIdentifier: "addTime", sender: nil)
-        }))
+            self.performSegue(withIdentifier: "AddTime", sender: nil)
+        }
         
-        controller.addAction(UIAlertAction(title: "Delete Task", style: .default, handler: { _ in
-            self.taskCollection.delete(task: task)
-        }))
-        
-        controller.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        
-        self.present(controller, animated: true, completion: nil)
+        self.showActionSheet(actions: [
+            "Rename Task": (.default,     { self.renameTask(task: task) }),
+            "Add Time":    (.default,     { queueSegue() }),
+            "Delete Task": (.destructive, { self.taskCollection.delete(task: task) }),
+        ])
     }
     
     func editDetail(recognizer: UILongPressGestureRecognizer) {
@@ -333,22 +249,34 @@ class ViewController: UIViewController, UITableViewDataSource, TaskCollectionDel
         let revIndex = index + task.durations.count - indexPath.row
         let duration = task.durations[revIndex]
         
-        let controller = UIAlertController(title: nil, message: duration.active() ? "Note: An active task detail cannot be deleted." : nil, preferredStyle: .actionSheet)
+        let message = duration.active() ? "Note: An active task detail cannot be deleted." : nil
+        let noteKey = duration.note == nil ? "Add note" : "Update note"
         
-        controller.addAction(UIAlertAction(title: duration.note == nil ? "Add note" : "Update note", style: .default, handler: { _ in
-            self.segueTask = task
-            self.segueDurationIndex = revIndex
-            self.performSegue(withIdentifier: "addNote", sender: nil)
-        }))
-        
+        var actions: [String: (UIAlertActionStyle, () -> ())] = [
+            noteKey: (.default, {
+                self.segueTask = task
+                self.segueDurationIndex = revIndex
+                self.performSegue(withIdentifier: "ChangeNote", sender: nil)
+            }),
+        ]
+            
         if !duration.active() {
-            controller.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
-                self.deleteDuration(duration: duration, index: revIndex)
-            }))
+            actions["Delete"] = (.destructive, {
+                self.taskCollection.delete(duration: duration, index: revIndex)
+            })
+        }
+        
+        self.showActionSheet(message: message, actions: actions)
+    }
+    
+    private func showActionSheet(message: String? = nil, actions: [String: (UIAlertActionStyle, () -> ())]) {
+        let controller = UIAlertController(title: nil, message: message, preferredStyle: .actionSheet)
+        
+        for (name, (style, fn)) in actions {
+            controller.addAction(UIAlertAction(title: name, style: style, handler: { _ in fn() }))
         }
         
         controller.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        
         self.present(controller, animated: true, completion: nil)
     }
     
@@ -360,7 +288,7 @@ class ViewController: UIViewController, UITableViewDataSource, TaskCollectionDel
             return
         }
         
-        if segue.identifier == "addTime" {
+        if segue.identifier == "AddTime" {
             guard let controller = controller as? AddTimeViewController else {
                 return
             }
@@ -372,8 +300,8 @@ class ViewController: UIViewController, UITableViewDataSource, TaskCollectionDel
             }
         }
         
-        if segue.identifier == "addNote" {
-            guard let controller = controller as? AddNoteViewController else {
+        if segue.identifier == "ChangeNote" {
+            guard let controller = controller as? ChangeNoteViewController else {
                 return
             }
             
@@ -411,13 +339,25 @@ class ViewController: UIViewController, UITableViewDataSource, TaskCollectionDel
         return self.makeTaskCell(tableView: tableView, indexPath: indexPath)
     }
     
+    //
+    // Mark: - Table View Delegate
+    
+    func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if let cell = cell as? TaskCell {
+            cell.teardown()
+        }
+    }
+    
+    //
+    // Mark: - Table View Cell Factories
+    
     private func makeTaskCell(tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "task", for: indexPath)
         
         if let cell = cell as? TaskCell {
             let index = self.taskCollection.taskIndex(tableIndex: indexPath.row)
             
-            cell.setup(task: self.taskCollection.task(at: index), index: index, delegate: self)
+            cell.setup(task: self.taskCollection.task(at: index), index: index, delegate: self.taskCollection)
             cell.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(expand(recognizer:))))
             cell.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(edit(recognizer:))))
         }
@@ -454,6 +394,7 @@ class ViewController: UIViewController, UITableViewDataSource, TaskCollectionDel
         return cell
     }
     
+    //
     // Mark: - Cell Accessors
     
     func cellAt(index: Int) -> TaskCell? {
@@ -463,5 +404,4 @@ class ViewController: UIViewController, UITableViewDataSource, TaskCollectionDel
     func detailCellAt(index: Int) -> TaskDetailCell? {
         return self.tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? TaskDetailCell
     }
-    
 }

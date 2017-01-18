@@ -90,7 +90,7 @@ class AddTimeViewController: UITableViewController {
             }
         }
         
-        self.delegate?.addTime(first: first, final: final)
+        self.delegate?.shouldAddTime(from: first, to: final)
         self.dismiss(animated: true, completion: nil)
     }
     
