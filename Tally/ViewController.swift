@@ -194,7 +194,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     //
     // Mark: - Gesture Recognizers in Cells
         
-    func expand(recognizer: UITapGestureRecognizer) {
+    @objc func expand(recognizer: UITapGestureRecognizer) {
         guard let indexPath = self.tableView.indexPathForRow(at: recognizer.location(in: self.tableView)) else {
             return
         }
@@ -206,7 +206,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         self.taskCollection.toggleExpansion(index: self.taskCollection.taskIndex(tableIndex: indexPath.row))
     }
     
-    func edit(recognizer: UILongPressGestureRecognizer) {
+    @objc func edit(recognizer: UILongPressGestureRecognizer) {
         if recognizer.state != .began {
             return
         }
@@ -231,7 +231,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         ])
     }
     
-    func editDetail(recognizer: UILongPressGestureRecognizer) {
+    @objc func editDetail(recognizer: UILongPressGestureRecognizer) {
         if recognizer.state != .began {
             return
         }

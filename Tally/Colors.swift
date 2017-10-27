@@ -20,19 +20,22 @@ extension UIColor {
 }
 
 func makeRandomColor(mix: UIColor) -> UIColor {
-    let r = Float(arc4random_uniform(255)) / 255
-    let g = Float(arc4random_uniform(255)) / 255
-    let b = Float(arc4random_uniform(255)) / 255
-    
-    return mixColors(UIColor(colorLiteralRed: r, green: g, blue: b, alpha: 1), UIColor.white)
+    return mixColors(UIColor(
+        red: CGFloat(arc4random_uniform(255)) / 255,
+        green: CGFloat(arc4random_uniform(255)) / 255,
+        blue: CGFloat(arc4random_uniform(255)) / 255,
+        alpha: 1
+    ), UIColor.white)
 }
 
 func mixColors(_ a: UIColor, _ b: UIColor) -> UIColor {
     let (r1, g1, b1, a1) = a.components
     let (r2, g2, b2, a2) = b.components
     
-    return UIColor(colorLiteralRed: Float(r1 + r2) / 2,
-                   green: Float(g1 + g2) / 2,
-                   blue: Float(b1 + b2) / 2,
-                   alpha: Float(a1 + a2) / 2)
+    return UIColor(
+        red: CGFloat(r1 + r2) / 2,
+        green: CGFloat(g1 + g2) / 2,
+        blue: CGFloat(b1 + b2) / 2,
+        alpha: CGFloat(a1 + a2) / 2
+    )
 }
